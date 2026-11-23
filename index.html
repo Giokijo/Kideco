@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kideco · Component Health Monitoring</title>
+<meta name="theme-color" content="#060b17">
+<style>
+:root{--ok:#16a34a;--cau:#eab308;--cri:#ef4444;--ext:#7f1d1d;--nd:#64748b;--a1:#38bdf8;--a2:#818cf8;--r:16px;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+[data-theme=dark]{color-scheme:dark;--bg:#060b17;--card:rgba(17,26,46,.78);--solid:#0f1a30;--line:rgba(148,163,184,.16);--tx:#f1f5ff;--sub:#8b9bb8;--hov:rgba(56,189,248,.09)}
+[data-theme=light]{color-scheme:light;--bg:#eef2f9;--card:rgba(255,255,255,.92);--solid:#fff;--line:#d9e2f0;--tx:#13223a;--sub:#5f7189;--hov:#e8f3ff}
+*{box-sizing:border-box;margin:0}
+body{background:radial-gradient(900px 500px at 5% -10%,rgba(56,189,248,.14),transparent 60%),radial-gradient(800px 500px at 100% 0,rgba(129,140,248,.12),transparent 60%),var(--bg);background-attachment:fixed;color:var(--tx);min-height:100vh;padding:clamp(10px,2vw,24px);font-size:13px}
+button,select,input{font:inherit;color:inherit}button{cursor:pointer;background:none;border:0}
+:focus-visible{outline:2px solid var(--a1);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:0 10px 28px rgba(0,0,0,.12)}
+.sub{color:var(--sub)}.mono{font-variant-numeric:tabular-nums}
+.btn{border:1px solid var(--line);background:var(--solid);border-radius:11px;padding:8px 13px;font-weight:600;font-size:12px;white-space:nowrap;transition:.15s}
+.btn:hover{background:var(--hov)}.btn:disabled{opacity:.5;pointer-events:none}
+.btn.pri{background:linear-gradient(120deg,#0284c7,#6366f1);color:#fff;border-color:transparent}
+.btn.grn{background:linear-gradient(120deg,#059669,#10b981);color:#fff;border-color:transparent}
+.fld{background:var(--solid);border:1px solid var(--line);border-radius:11px;padding:8px 12px;min-height:36px}
+/* header */
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 18px;margin-bottom:8px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(37,99,235,.2);border:1px solid rgba(59,130,246,.3);font-size:22px}
+h1{font-size:clamp(16px,2.2vw,20px);letter-spacing:-.02em}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font-size:11px;font-weight:600;padding:5px 11px;border-radius:99px;border:1px solid var(--line);color:var(--sub);display:inline-flex;gap:6px;align-items:center}
+.chip:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--nd)}
+.chip[data-s=live]:before{background:#10b981;box-shadow:0 0 8px #10b981}.chip[data-s=cached]:before{background:var(--cau)}.chip[data-s=error]:before{background:var(--cri)}.chip[data-s=busy]:before{background:var(--a1);animation:p 1s infinite}
+@keyframes p{50%{opacity:.25}}
+#meta{font-size:11px;margin:0 4px 12px}
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px}
+.kpi{padding:12px 14px;border-left:4px solid var(--c,var(--a1))}
+.kpi small{font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--sub)}
+.kpi b{display:block;font-size:26px;letter-spacing:-.03em;margin:2px 0;color:var(--c,var(--tx))}
+.kpi span{font-size:11px;color:var(--sub)}
+[data-theme=dark] .kpi[data-k=ext] b{color:#f87171}
+/* overview */
+.row2{display:grid;grid-template-columns:minmax(300px,1.05fr) 1.4fr 1fr;gap:12px;margin-bottom:12px}
+.panel{padding:14px 16px;min-width:0}
+.panel h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--a1);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.donut{display:flex;align-items:center;gap:16px}
+.donut .cv{position:relative;width:170px;height:170px;flex:none}
+.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut svg circle{transition:stroke-width .15s;cursor:pointer}.donut svg circle:hover{stroke-width:24}
+.donut .ctr{position:absolute;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}.donut .ctr b{font-size:26px}
+.legend{display:grid;gap:6px;flex:1;min-width:0}
+.legend button{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;border:1px solid var(--line);font-weight:600;font-size:12px;text-align:left}
+.legend button:hover,.legend button.on{background:var(--hov)}.legend button.on{border-color:var(--a1)}
+.lt{display:inline-flex;align-items:center;gap:7px}.lt i{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800;color:#fff}
+.nd-note{font-size:10.5px;margin-top:8px}
+.plist{max-height:236px;overflow:auto;display:grid;gap:6px;scrollbar-width:thin;padding-right:2px}
+.pi{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;text-align:left;padding:7px 10px;border-radius:10px;border:1px solid var(--line);border-left:4px solid var(--c)}
+.pi:hover{background:var(--hov)}.pi b{font-size:12px}.pi .sub{font-size:10.5px}.pi .why{grid-column:1/-1;font-size:11px}
+.hot{display:grid;gap:6px;max-height:236px;overflow:auto;scrollbar-width:thin}
+.hot button{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;text-align:left}
+.hot button:hover{background:var(--hov)}.hot .cnt{display:flex;gap:4px}
+.cnt i{font-style:normal;font-size:10px;font-weight:800;padding:1px 6px;border-radius:99px;color:#fff}
+/* models */
+.models{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;margin-bottom:8px;scrollbar-width:thin}
+.model{flex:none;display:flex;gap:10px;align-items:center;padding:9px 14px;border-radius:13px;border:1px solid var(--line);background:var(--card);font-weight:700;text-align:left}
+.model:hover{background:var(--hov)}.model.on{background:linear-gradient(120deg,#0369a1,#6366f1);color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(99,102,241,.28)}
+.model em{font-style:normal;font-size:22px}.model small{display:block;font-size:10px;font-weight:500;opacity:.8}
+.bar{display:flex;flex-wrap:wrap;gap:8px;padding:10px;margin-bottom:12px;align-items:center}#q{flex:1;min-width:200px}
+.bar label{display:inline-flex;gap:6px;align-items:center;font-size:12px;cursor:pointer;padding:0 4px}
+/* matrix */
+.wrap{max-height:75vh;overflow:auto;scrollbar-width:thin;overscroll-behavior:contain}
+table{border-collapse:separate;border-spacing:0;width:100%}
+th{position:sticky;top:0;z-index:5;background:var(--solid);color:var(--sub);font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+th.hl{color:var(--cau)}
+td{padding:5px;vertical-align:top;border-bottom:1px solid var(--line)}
+.ca{position:sticky;left:0;z-index:4;background:var(--solid);width:170px;min-width:170px;border-right:1px solid var(--line);padding:10px}
+th.ca{z-index:6;text-align:left;color:var(--a1)}
+.cc{width:196px;min-width:196px}
+tr:hover td{background:var(--hov)}tr:hover td.ca{background:var(--solid)}
+.uid{font-weight:800;color:var(--a1);font-size:14px;text-align:left;display:block}.uid:hover{text-decoration:underline}
+.ui{font-size:10.5px;margin-top:2px;line-height:1.45}
+.ucnt{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+/* tile */
+.tile{--c:var(--ok);display:flex;flex-direction:column;gap:5px;width:100%;min-height:150px;padding:8px 10px;border-radius:12px;text-align:left;
+ border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-left:5px solid var(--c);
+ background:color-mix(in srgb,var(--c) var(--mix,16%),var(--solid));font-size:10.5px;line-height:1.3;transition:transform .15s,box-shadow .15s}
+.tile:hover{transform:translateY(-2px);box-shadow:0 8px 20px color-mix(in srgb,var(--c) 30%,transparent)}
+.tile[data-s=Caution]{--c:var(--cau);--mix:24%}
+.tile[data-s=Critical]{--c:var(--cri);--mix:32%}
+.tile[data-s=Extreme]{--c:var(--ext);--mix:100%;color:#fff;border-left-color:#450a0a}
+.tile[data-s="No Data"]{--c:var(--nd);--mix:6%;border-style:dashed;border-left-style:solid}
+.tile.dim{opacity:.18;filter:grayscale(1)}
+.tile.ph{min-height:60px;opacity:.4;border-style:dashed;--c:var(--nd);--mix:0%;justify-content:center;align-items:center}
+.th{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.th b{font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
+.tile[data-s=Normal] .th b{color:#22c55e}.tile[data-s=Caution] .th b{color:#ca8a04}[data-theme=dark] .tile[data-s=Caution] .th b{color:#facc15}.tile[data-s=Critical] .th b{color:#dc2626}[data-theme=dark] .tile[data-s=Critical] .th b{color:#fca5a5}.tile[data-s="No Data"] .th b{color:var(--sub)}
+.life{display:grid;gap:3px}
+.life .l1{display:flex;justify-content:space-between;gap:4px}
+.lb{height:5px;border-radius:9px;background:rgba(127,140,160,.25);overflow:hidden}.lb i{display:block;height:100%;border-radius:9px}
+.over{font-weight:800;color:#dc2626}.tile[data-s=Extreme] .over,[data-theme=dark] .over{color:#fca5a5}
+.cm{display:grid;grid-template-columns:30px auto 1fr;gap:3px 6px;align-items:center;padding-top:5px;border-top:1px solid color-mix(in srgb,currentColor 14%,transparent)}
+.cm>span:nth-child(3n+1){font-weight:700;font-size:9.5px;opacity:.75}
+.g{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:5px;font-weight:800;font-size:10px;color:#fff;background:var(--nd)}
+.g[data-g=A]{background:#16a34a}.g[data-g=B]{background:#eab308;color:#422006}.g[data-g=C]{background:#ef4444}.g[data-g=X]{background:#7f1d1d;box-shadow:inset 0 0 0 1.5px #fca5a5}
+.tr{display:inline-flex;gap:2px;align-items:center}.tr .g{width:13px;height:13px;font-size:8px;border-radius:4px;opacity:.9}
+.tr small{font-size:9px;opacity:.7;margin-right:3px}
+.act{font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tf{margin-top:auto;display:flex;flex-wrap:wrap;gap:4px}
+.pill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(127,140,160,.22);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.pill.y{background:linear-gradient(120deg,#fde68a,#fbbf24);color:#78350f}
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(2,6,23,.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:12px}
+.modal[hidden]{display:none}
+.dlg{width:min(97vw,var(--w,900px));max-height:94vh;overflow:auto;background:var(--solid);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 30px 70px rgba(0,0,0,.45)}
+.dh{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.dh h2{font-size:16px}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:12px;border-radius:13px;background:rgba(100,116,139,.09);margin-bottom:14px}
+.info small{display:block;font-size:9.5px;text-transform:uppercase;color:var(--sub);font-weight:700;margin-bottom:2px}
+.sec{margin-bottom:14px}.sec h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--a1);margin-bottom:8px}
+.seq{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.box{border-radius:12px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 12%,transparent);padding:8px 11px;margin-bottom:6px;font-size:12px;border-left:5px solid var(--c)}
+.htable{width:100%;font-size:12px}.htable td,.htable th{position:static;padding:6px 8px;text-align:left}
+.ugrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}.ugrid strong{display:block;font-size:10px;color:var(--sub);text-transform:uppercase;margin-bottom:4px}
+#toast{position:fixed;right:16px;bottom:18px;z-index:90;max-width:min(420px,92vw);padding:12px 16px;border-radius:12px;background:#18304e;color:#fff;border:1px solid #3b82f6;box-shadow:0 18px 46px rgba(0,0,0,.45)}#toast[hidden]{display:none}
+.rules{font-size:11px;line-height:1.55}.rules li{margin-left:16px}
+@media(max-width:1200px){.row2{grid-template-columns:1fr 1fr}.row2>.panel:first-child{grid-column:1/-1}.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:720px){.row2{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.ca{width:120px;min-width:120px}.donut{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="card">
+  <div class="brand"><div class="logo">🚜</div><div><h1>Kideco Component Health Monitoring</h1><div class="sub" style="font-size:11px">Component Life · SOS · Magnetic Plug · Cutting Filter · CTS</div></div></div>
+  <div class="tools">
+    <span class="chip" id="chip">Data: waiting</span>
+    <select id="theme" class="fld" aria-label="Theme"><option value="dark">🌙 Dark</option><option value="light">☀️ Light</option></select>
+    <button id="rules" class="btn">ℹ Rules</button>
+    <button id="file" class="btn" title="Load a .xlsx or .csv file instead of Google Sheets">📂 Load file</button>
+    <button id="sync" class="btn pri">🔄 Sync</button>
+    <input id="fileIn" type="file" accept=".csv,.xlsx,.xls" hidden>
+  </div>
+</header>
+<div id="meta" class="sub">Loading data from Google Sheets…</div>
+
+<section class="kpis">
+  <div class="card kpi" style="--c:var(--a1)"><small>Units</small><b id="k-units">—</b><span id="k-units-n">&nbsp;</span></div>
+  <div class="card kpi" data-k="ext" style="--c:var(--ext)"><small>Extreme</small><b id="k-ext">—</b><span id="k-ext-n">&nbsp;</span></div>
+  <div class="card kpi" style="--c:var(--cri)"><small>Critical</small><b id="k-cri">—</b><span id="k-cri-n">&nbsp;</span></div>
+  <div class="card kpi" style="--c:var(--cau)"><small>Caution</small><b id="k-cau">—</b><span id="k-cau-n">&nbsp;</span></div>
+  <div class="card kpi" style="--c:var(--ok)"><small>Normal</small><b id="k-ok">—</b><span id="k-ok-n">&nbsp;</span></div>
+  <div class="card kpi" style="--c:#a855f7"><small>Over target life</small><b id="k-over">—</b><span id="k-over-n">&nbsp;</span></div>
+</section>
+
+<section class="row2">
+  <div class="card panel"><h2>Fleet health <span id="chart-lbl" class="sub">ALL</span></h2>
+    <div class="donut"><div class="cv"><svg viewBox="0 0 200 200" id="pie"></svg><div class="ctr"><b id="pct">–</b><span class="sub" style="font-size:10px">Normal</span></div></div><div class="legend" id="legend"></div></div>
+    <div class="nd-note sub" id="nd-note"></div></div>
+  <div class="card panel"><h2>Priority actions <span id="p-n" class="sub"></span></h2><div class="plist" id="plist"></div></div>
+  <div class="card panel"><h2>Hotspot components <button id="reset-st" class="btn" hidden style="padding:3px 9px">Clear filter</button></h2><div class="hot" id="hot"></div></div>
+</section>
+
+<div class="models" id="models"></div>
+
+<section class="card bar">
+  <input id="q" class="fld" placeholder="🔍 Search unit, component, remark…" autocomplete="off">
+  <select id="st" class="fld"><option value="ALL">All statuses</option><option>Extreme</option><option>Critical</option><option>Caution</option><option>Normal</option><option>No Data</option></select>
+  <select id="dept" class="fld"><option value="ALL">All departments</option></select>
+  <select id="sort" class="fld"><option value="unit">Unit A–Z</option><option value="risk">Highest risk</option><option value="life">Highest life %</option></select>
+  <label><input type="checkbox" id="cmonly"> Monitored components only</label>
+  <button id="reset" class="btn">Reset</button>
+  <button id="exp" class="btn grn">↓ Export CSV</button>
+</section>
+
+<section class="card" style="overflow:hidden">
+  <div class="wrap"><table><thead id="head"></thead><tbody id="body"><tr><td class="sub" style="padding:30px;text-align:center">Loading…</td></tr></tbody></table></div>
+</section>
+<div id="count" class="sub" style="font-size:11px;margin:8px 4px"></div>
+
+<div class="modal" id="m-comp" hidden><div class="dlg" style="--w:860px"><div class="dh"><h2 id="c-title"></h2><button class="btn" data-close>✕</button></div><div id="c-body"></div></div></div>
+<div class="modal" id="m-unit" hidden><div class="dlg" style="--w:1200px"><div class="dh"><h2 id="u-title"></h2><div class="tools"><button class="btn grn" id="u-exp">↓ CSV</button><button class="btn" data-close>✕</button></div></div><div id="u-body"></div></div></div>
+<div class="modal" id="m-rules" hidden><div class="dlg" style="--w:640px"><div class="dh"><h2>ℹ Health status rules</h2><button class="btn" data-close>✕</button></div>
+  <div class="rules">
+   <p><b>Reading results:</b> results are read from the <b>left</b>. Example <code>XBBACC</code> → latest result <b>X</b>, trend (last 3) <b>X B B</b>. “_” means no sample.</p><br>
+   <p><b>SOS / Magnetic Plug / Cutting Filter (latest result)</b></p>
+   <ul><li><span class="g" data-g="X">X</span> Extreme (dark red)</li><li><span class="g" data-g="C">C</span> Critical (red)</li><li><span class="g" data-g="B">B</span> Caution (yellow)</li><li><span class="g" data-g="A">A</span> Normal (green)</li></ul><br>
+   <p><b>Combined rule:</b> if latest SOS = B <b>and</b> Magnetic Plug = B <b>and</b> Cutting Filter = B → component becomes <b>Critical</b>.</p><br>
+   <p><b>CTS</b></p>
+   <ul><li>A → Normal</li><li>B → Caution · <i>Please order the parts</i></li><li>C → Critical · <i>Please schedule the replacement</i></li><li>X → Extreme · <i>Replace the parts immediately</i></li></ul><br>
+   <p><b>Component status</b> = the worst result of SOS, Magnetic Plug, Cutting Filter, CTS and the combined rule. Components with none of these results are <b>No Data</b> and are not counted in the pie chart. Component life % is shown separately (purple KPI) and does not change the health status.</p>
+  </div></div></div>
+<div id="toast" role="alert" hidden></div>
+
+<script>
+"use strict";
+/* ============ CONFIG ============ */
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQFViqCz82vKSPMwDaN5XwKbyp4xaJpHbkiLXAngXksFhZweanwRfaR3YLu0jI0qA/pub?output=csv";
+const AUTO_REFRESH_MIN=10;            // auto re-sync interval (minutes), 0 = off
+const CACHE_KEY="kdc_csv_v1",CACHE_AT="kdc_csv_at";
+
+/* ============ CONSTANTS ============ */
+const STATUS=["Normal","Caution","Critical","Extreme"],ALLST=[...STATUS,"No Data"];
+const COL={Normal:"#16a34a",Caution:"#eab308",Critical:"#ef4444",Extreme:"#7f1d1d","No Data":"#64748b"};
+const LETTER={Normal:"A",Caution:"B",Critical:"C",Extreme:"X","No Data":"–"};
+const GRADE={A:0,B:1,C:2,X:3};
+const SRC_TXT={
+ SOS:["","SOS Caution – shorten sampling interval and monitor trend","SOS Critical – resample and inspect component, plan corrective action","SOS Extreme – stop the unit and inspect component immediately"],
+ MP:["","Magnetic plug Caution – check debris at next service","Magnetic plug Critical – inspect for internal wear","Magnetic plug Extreme – heavy debris, inspect component immediately"],
+ CF:["","Cutting filter Caution – check filter debris at next service","Cutting filter Critical – inspect for internal wear","Cutting filter Extreme – heavy debris, inspect component immediately"],
+ CTS:["","CTS Caution – please order the parts","CTS Critical – please schedule the replacement","CTS Extreme – replace the parts immediately"]};
+const COMBO_TXT="SOS, Magnetic Plug & Cutting Filter all B – escalated to Critical, inspect component";
+const S={model:"ALL",st:"ALL",q:"",dept:"ALL",sort:"unit",cmonly:false};
+let RECS=[],UNITS=[],COMPS=[],SRC={at:0,from:""},CUR_UNIT=null;
+
+/* ============ HELPERS ============ */
+const $=id=>document.getElementById(id),txt=v=>String(v??"").trim();
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const nk=s=>txt(s).toLowerCase().replace(/[^a-z0-9]/g,"");
+const lsGet=k=>{try{return localStorage.getItem(k)}catch{return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch{}};
+const natural=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"});
+function toast(m){const e=$("toast");e.textContent=m;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,5000)}
+function chip(s,t){const e=$("chip");e.dataset.s=s;e.textContent=t}
+function num(v){let s=txt(v).replace(/%$/,"").replace(/\s/g,"");if(!s||!/^[+-]?[\d.,]+$/.test(s))return NaN;
+ if(s.includes(".")&&s.includes(","))s=s.replace(/,/g,"");else if(s.includes(",")){const p=s.split(",");s=p.length===2&&p[1].length!==3?p.join("."):p.join("")}
+ return Number(s)}
+const fh=n=>Number.isFinite(n)?Math.round(n).toLocaleString("en-US"):"–";
+const f1=n=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:1}):"–";
+const pctTxt=p=>Number.isFinite(p)?Math.round(p*100)+"%":"–";
+const lifeCol=p=>!Number.isFinite(p)?"#64748b":p>=1?"#dc2626":p>=.85?"#f59e0b":"#22c55e";
+const g=(l,extra="")=>`<span class="g" data-g="${l}"${extra}>${l==="_"?"·":l}</span>`;
+
+/* ============ CSV PARSER ============ */
+function parseCSV(t){const rows=[];let row=[],f="",q=false;
+ for(let i=0;i<t.length;i++){const c=t[i];
+  if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c==='"')q=true;else if(c===","){row.push(f);f=""}
+  else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}else f+=c}
+ if(f||row.length){row.push(f);rows.push(row)}return rows}
+
+/* ============ GRADE / STATUS LOGIC ============ */
+// results are read from the LEFT: first letter = latest sample, first 3 = trend
+function grade(raw){const t=txt(raw).toUpperCase();if(!t||["-","NA","N/A","#N/A"].includes(t))return null;
+ const seq=t.replace(/[^ABCX_]/g,"");const l=(seq.match(/[ABCX]/)||[])[0];if(!l)return null;
+ return{seq,latest:l,trend:seq.slice(0,3)}}
+function ctsGrade(raw){const t=txt(raw).toUpperCase();return GRADE[t]!==undefined&&t.length===1?t:null}
+function evaluate(r){
+ let lv=-1;const acts=[];
+ for(const[k,o]of[["SOS",r.sos],["MP",r.mp],["CF",r.cf]])if(o){const v=GRADE[o.latest];lv=Math.max(lv,v);if(v>0)acts.push({lv:v,t:SRC_TXT[k][v]})}
+ if(r.sos?.latest==="B"&&r.mp?.latest==="B"&&r.cf?.latest==="B"){lv=Math.max(lv,2);acts.push({lv:2,t:COMBO_TXT,combo:1})}
+ if(r.cts){const v=GRADE[r.cts];lv=Math.max(lv,v);if(v>0)acts.push({lv:v,t:SRC_TXT.CTS[v]})}
+ acts.sort((a,b)=>b.lv-a.lv);
+ r.lv=lv;r.status=lv<0?"No Data":STATUS[lv];r.acts=acts;r.combo=acts.some(a=>a.combo)}
+
+/* ============ BUILD DATA ============ */
+function build(rows){
+ const hi=rows.findIndex(r=>r.some(c=>nk(c)==="unitno"));if(hi<0)throw Error('Header "Unit No." not found in data');
+ const H=rows[hi].map(nk),find=(...n)=>{for(const x of n){const i=H.indexOf(x);if(i>=0)return i}return-1},starts=p=>H.findIndex(h=>h.startsWith(p));
+ const C={unit:find("unitno"),type:find("unittype"),dept:find("dept"),model:find("model"),mfg:find("manufacture"),comp:find("component"),hm:find("currenthm"),
+  life:find("componentlifehours"),target:find("targetlifetimehours"),pct:find("componentlifetime"),remH:starts("compliferemaininghour"),remM:starts("compliferemainingmonth"),
+  avg:starts("avgschedule"),cstat:find("statuscomponent"),sos:find("sos"),cf:starts("cuttingfilter"),mp:starts("magneticplug"),top:starts("topupoil"),cts:find("cts"),
+  hist:starts("maintenance"),rating:find("rating"),warr:starts("warranty")};
+ if(C.comp<0||C.model<0)throw Error("Columns Component / Model not found");
+ const chg=["1st","2nd","3rd","4th","5th"].map(n=>H.indexOf(n)).filter(i=>i>=0);
+ const get=(r,i)=>i>=0?txt(r[i]):"";
+ const map=new Map(),order=[];
+ for(const r of rows.slice(hi+1)){
+  const unit=get(r,C.unit),comp=get(r,C.comp);if(!unit||!comp||nk(unit)==="unitno")continue;
+  const life=num(get(r,C.life)),target=num(get(r,C.target));let pct=life/target;
+  if(!Number.isFinite(pct)){const p=get(r,C.pct);pct=num(p);if(Number.isFinite(pct)&&/%$/.test(p))pct/=100}
+  const rec={unit,comp,type:get(r,C.type),dept:get(r,C.dept)||"-",model:get(r,C.model)||"UNSPECIFIED",mfg:get(r,C.mfg),hm:num(get(r,C.hm)),
+   life,target,pct,remH:num(get(r,C.remH)),remM:num(get(r,C.remM)),avg:num(get(r,C.avg)),
+   cstat:(v=>v==="-"||v==="0"?"":v)(get(r,C.cstat)),sos:grade(get(r,C.sos)),mp:grade(get(r,C.mp)),cf:grade(get(r,C.cf)),cts:ctsGrade(get(r,C.cts)),ctsRaw:get(r,C.cts),
+   top:get(r,C.top),hist:(v=>v==="-"?"":v)(get(r,C.hist)),rating:get(r,C.rating),warr:get(r,C.warr),
+   changes:chg.map(i=>({hm:txt(r[i]),date:txt(r[i+1])})).filter(x=>x.hm&&x.hm!=="-")};
+  evaluate(rec);map.set(unit+"|"+comp,rec);if(!order.includes(comp))order.push(comp)}
+ RECS=[...map.values()];COMPS=order;
+ const um=new Map();for(const r of RECS){const u=um.get(r.unit)||um.set(r.unit,{id:r.unit,model:r.model,dept:r.dept,type:r.type,hm:r.hm,comps:{}}).get(r.unit);u.comps[r.comp]=r;if(!(u.hm>=r.hm))u.hm=Number.isFinite(r.hm)?r.hm:u.hm}
+ UNITS=[...um.values()].sort((a,b)=>natural(a.id,b.id));
+ if(!RECS.length)throw Error("No component rows found");
+ if(S.model!=="ALL"&&!UNITS.some(u=>u.model===S.model))S.model="ALL";
+ const depts=[...new Set(UNITS.map(u=>u.dept))].sort();
+ $("dept").innerHTML='<option value="ALL">All departments</option>'+depts.map(d=>`<option${d===S.dept?" selected":""}>${esc(d)}</option>`).join("")}
+
+/* ============ LOADING ============ */
+async function loadText(text,from,save){
+ build(parseCSV(text));SRC={at:Date.now(),from};if(save){lsSet(CACHE_KEY,text);lsSet(CACHE_AT,String(SRC.at))}render()}
+async function sync(){
+ const b=$("sync");b.disabled=true;chip("busy","Data: syncing");
+ try{const res=await fetch(CSV_URL+(CSV_URL.includes("?")?"&":"?")+"_="+Date.now(),{cache:"no-store"});
+  if(!res.ok)throw Error("HTTP "+res.status);const t=await res.text();if(/^\s*<!doctype html/i.test(t))throw Error("Sheet is not published as CSV");
+  await loadText(t,"Google Sheets",true);chip("live",`Live · ${UNITS.length} units`);
+  $("meta").textContent=`Synced ${new Date(SRC.at).toLocaleString()} · ${RECS.length} components · source: Google Sheets`}
+ catch(e){const c=lsGet(CACHE_KEY);
+  if(c&&!RECS.length){try{await loadText(c,"cache",false);SRC.at=+lsGet(CACHE_AT)||0}catch{}}
+  chip(RECS.length?"cached":"error",RECS.length?"Data: cached":"Data: unavailable");
+  $("meta").textContent=RECS.length?`Google Sheets unavailable (${e.message}) · showing saved data from ${SRC.at?new Date(SRC.at).toLocaleString():"—"}`:`Could not load data: ${e.message}`;
+  toast("Sync failed: "+e.message)}
+ finally{b.disabled=false}}
+async function loadFile(f){
+ try{chip("busy","Data: reading file");let t;
+  if(/\.csv$/i.test(f.name))t=await f.text();
+  else{if(!window.XLSX)await new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";s.onload=ok;s.onerror=()=>no(Error("Could not load Excel reader"));document.head.append(s)});
+   const wb=XLSX.read(await f.arrayBuffer());const name=wb.SheetNames.find(n=>/comp/i.test(n))||wb.SheetNames[0];t=XLSX.utils.sheet_to_csv(wb.Sheets[name])}
+  await loadText(t,f.name,false);chip("cached",`File · ${UNITS.length} units`);$("meta").textContent=`Loaded from file “${f.name}” · ${RECS.length} components (press Sync to return to Google Sheets)`}
+ catch(e){toast("File error: "+e.message);chip("error","Data: file error")}}
+
+/* ============ VIEW HELPERS ============ */
+const scope=()=>UNITS.filter(u=>(S.model==="ALL"||u.model===S.model)&&(S.dept==="ALL"||u.dept===S.dept));
+const recsOf=units=>units.flatMap(u=>Object.values(u.comps));
+const worst=u=>Math.max(-1,...Object.values(u.comps).map(c=>c.lv));
+const maxLife=u=>Math.max(0,...Object.values(u.comps).map(c=>Number.isFinite(c.pct)?c.pct:0));
+function visible(){
+ const q=S.q.toLowerCase();
+ let a=scope().filter(u=>(S.st==="ALL"||Object.values(u.comps).some(c=>c.status===S.st))&&(!q||[u.id,u.model,u.dept,...Object.values(u.comps).flatMap(c=>[c.comp,c.hist,c.cstat])].some(v=>txt(v).toLowerCase().includes(q))));
+ if(S.sort==="risk")a.sort((x,y)=>worst(y)-worst(x)||recsOf([y]).filter(c=>c.lv>=2).length-recsOf([x]).filter(c=>c.lv>=2).length||natural(x.id,y.id));
+ if(S.sort==="life")a.sort((x,y)=>maxLife(y)-maxLife(x)||natural(x.id,y.id));
+ return a}
+function compCols(units){const set=new Set();for(const u of units)for(const c of Object.values(u.comps))if(!S.cmonly||c.status!=="No Data")set.add(c.comp);return COMPS.filter(c=>set.has(c))}
+const counts=recs=>{const s={Normal:0,Caution:0,Critical:0,Extreme:0,"No Data":0};for(const r of recs)s[r.status]++;return s};
+const cntBadges=s=>["Extreme","Critical","Caution"].filter(k=>s[k]).map(k=>`<i style="background:${COL[k]}${k==="Caution"?";color:#422006":""}" title="${k}">${s[k]} ${LETTER[k]}</i>`).join("");
+
+/* ============ TILE ============ */
+function trendHtml(o){return o?`<span class="tr"><small>trend</small>${[...o.trend].map(l=>g(l)).join("")}</span>`:""}
+function tile(r){
+ if(!r)return`<div class="tile ph sub">—</div>`;
+ const dim=S.st!=="ALL"&&r.status!==S.st,over=r.pct>=1,top=r.acts[0];
+ const rows=[["SOS",r.sos],["MP",r.mp],["CF",r.cf]].filter(x=>x[1]).map(([k,o])=>`<span>${k}</span>${g(o.latest)}${trendHtml(o)}`).join("")+(r.cts?`<span>CTS</span>${g(r.cts)}<span style="font-size:9.5px">${r.cts==="A"?"Normal":["","Order parts","Schedule replacement","Replace immediately"][GRADE[r.cts]]}</span>`:"");
+ return`<button class="tile${dim?" dim":""}" data-s="${r.status}" data-cell="${esc(r.unit)}|${esc(r.comp)}" title="${esc(r.acts.map(a=>a.t).join("\n")||r.status)}">
+  <div class="th"><b>${r.status}</b>${r.status!=="No Data"?g(LETTER[r.status]):""}</div>
+  <div class="life"><div class="l1"><span class="mono">${fh(r.life)} / ${fh(r.target)} h</span><b class="mono${over?" over":""}">${pctTxt(r.pct)}</b></div>
+   <div class="lb"><i style="width:${Math.min(100,Math.max(0,(r.pct||0)*100))}%;background:${lifeCol(r.pct)}"></i></div>
+   <div class="l1" style="opacity:.85;white-space:nowrap"><span>Rem.</span><span class="mono${over?" over":""}">${fh(r.remH)} h${Number.isFinite(r.remM)?" · "+f1(r.remM)+" mo":""}</span></div></div>
+  ${rows?`<div class="cm">${rows}</div>`:""}
+  ${top?`<div class="act">⚠ ${esc(top.t)}</div>`:""}
+  ${r.hist||r.cstat?`<div class="tf">${r.cstat?`<span class="pill y">${esc(r.cstat)}</span>`:""}${r.hist?`<span class="pill" title="${esc(r.hist)}">${esc(r.hist)}</span>`:""}</div>`:""}
+ </button>`}
+
+/* ============ RENDER ============ */
+function render(){
+ const units=scope(),recs=recsOf(units),s=counts(recs),mon=recs.length-s["No Data"],vis=visible();
+ const uc=k=>new Set(recs.filter(r=>r.status===k).map(r=>r.unit)).size,over=recs.filter(r=>r.pct>=1);
+ $("k-units").textContent=units.length;$("k-units-n").textContent=`${recs.length} components · ${mon} monitored`;
+ for(const[k,id]of[["Extreme","ext"],["Critical","cri"],["Caution","cau"],["Normal","ok"]]){$("k-"+id).textContent=s[k];$("k-"+id+"-n").textContent=k==="Normal"?`${mon?Math.round(s.Normal/mon*100):0}% of monitored`:`${uc(k)} unit${uc(k)===1?"":"s"} affected`}
+ $("k-over").textContent=over.length;$("k-over-n").textContent=`${new Set(over.map(r=>r.unit)).size} units · life ≥ 100%`;
+ // models
+ const models=[...new Set(UNITS.map(u=>u.model))].sort();
+ $("models").innerHTML=`<button class="model${S.model==="ALL"?" on":""}" data-m="ALL"><em>🏗</em><span>All Fleet<small>${UNITS.length} units</small></span></button>`+
+  models.map(m=>{const us=UNITS.filter(u=>u.model===m),c=counts(recsOf(us));return`<button class="model${S.model===m?" on":""}" data-m="${esc(m)}"><em>🚜</em><span>${esc(m)}<small>${us.length} units · ${c.Extreme} X · ${c.Critical} C · ${c.Caution} B</small></span></button>`}).join("");
+ // donut
+ $("chart-lbl").textContent=S.model==="ALL"?"All fleet":S.model;
+ $("pct").textContent=mon?Math.round(s.Normal/mon*100)+"%":"–";
+ const R=80,L=2*Math.PI*R;let off=0;
+ $("pie").innerHTML=`<circle cx="100" cy="100" r="${R}" fill="none" stroke="rgba(127,140,160,.18)" stroke-width="20"/>`+(mon?STATUS.map(k=>{const v=s[k]/mon*L;const h=v?`<circle cx="100" cy="100" r="${R}" fill="none" stroke="${COL[k]}" stroke-width="20" stroke-dasharray="${v} ${L-v}" stroke-dashoffset="${-off}" data-st="${k}"><title>${k}: ${s[k]}</title></circle>`:"";off+=v;return h}).join(""):"");
+ $("legend").innerHTML=[...STATUS].reverse().map(k=>`<button data-st="${k}" class="${S.st===k?"on":""}"><span class="lt"><i style="background:${COL[k]}${k==="Caution"?";color:#422006":""}">${LETTER[k]}</i>${k}</span><b class="mono">${s[k]} · ${mon?(s[k]/mon*100).toFixed(1):0}%</b></button>`).join("");
+ $("nd-note").innerHTML=s["No Data"]?`<button data-st="No Data" class="sub" style="text-decoration:underline">${s["No Data"]} components have no SOS / MP / CF / CTS result</button> (not counted in chart)`:"";
+ // priority list
+ const pr=recs.filter(r=>r.lv>=2).sort((a,b)=>b.lv-a.lv||(b.pct||0)-(a.pct||0)||natural(a.unit,b.unit));
+ $("p-n").textContent=pr.length?pr.length+" items":"";
+ $("plist").innerHTML=pr.length?pr.map(r=>`<button class="pi" style="--c:${COL[r.status]}" data-cell="${esc(r.unit)}|${esc(r.comp)}"><b>${esc(r.unit)}</b><span><b>${esc(r.comp)}</b> <span class="sub">· ${r.status} · life ${pctTxt(r.pct)}</span></span><span class="why">${esc(r.acts[0]?.t||"")}</span></button>`).join(""):'<div class="sub">No Extreme or Critical components 🎉</div>';
+ // hotspots
+ const hm=new Map();for(const r of recs)if(r.lv>=1){const e=hm.get(r.comp)||hm.set(r.comp,{Extreme:0,Critical:0,Caution:0}).get(r.comp);e[r.status]++}
+ const hot=[...hm].sort((a,b)=>b[1].Extreme-a[1].Extreme||b[1].Critical-a[1].Critical||b[1].Caution-a[1].Caution);
+ $("hot").innerHTML=hot.length?hot.map(([n,v])=>`<button data-comp="${esc(n)}"><span>${esc(n)}</span><span class="cnt">${cntBadges(v)}</span></button>`).join(""):'<div class="sub">No abnormal components.</div>';
+ $("reset-st").hidden=S.st==="ALL";$("st").value=S.st;
+ renderTable(vis);
+ $("count").textContent=`${vis.length} of ${units.length} units shown`}
+function renderTable(vis){
+ const cols=compCols(vis.length?vis:scope());
+ $("head").innerHTML=`<tr><th class="ca">Unit</th>${cols.map(c=>`<th data-c="${esc(c)}">${esc(c)}</th>`).join("")}</tr>`;
+ $("body").innerHTML=vis.length?vis.map(u=>{const c=counts(Object.values(u.comps));
+  return`<tr><td class="ca"><button class="uid" data-unit="${esc(u.id)}">${esc(u.id)} ↗</button><div class="ui sub">${esc(u.model)} · ${esc(u.dept)}<br>HM ${fh(u.hm)} h</div><div class="ucnt cnt">${cntBadges(c)||'<i style="background:#16a34a">OK</i>'}</div></td>${cols.map(k=>`<td class="cc">${tile(u.comps[k])}</td>`).join("")}</tr>`}).join("")
+  :`<tr><td colspan="${cols.length+1}" class="sub" style="text-align:center;padding:30px">No matching units.</td></tr>`}
+function focusComp(n){const th=[...document.querySelectorAll("th[data-c]")].find(t=>t.dataset.c===n);if(th){th.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});th.classList.add("hl");setTimeout(()=>th.classList.remove("hl"),2400)}}
+
+/* ============ MODALS ============ */
+const show=id=>{$(id).hidden=false;document.body.style.overflow="hidden"};
+const hide=id=>{$(id).hidden=true;if([..."m-comp m-unit m-rules".split(" ")].every(m=>$(m).hidden))document.body.style.overflow=""};
+function seqHtml(o,label){if(!o)return`<tr><td><b>${label}</b></td><td class="sub" colspan="2">No result</td></tr>`;
+ return`<tr><td><b>${label}</b></td><td>${g(o.latest)} <span class="sub">${["Normal","Caution","Critical","Extreme"][GRADE[o.latest]]}</span></td><td><div class="seq">${[...o.seq].map((l,i)=>g(l,i<3?' style="outline:2px solid var(--a1);outline-offset:1px"':"")).join("")}</div></td></tr>`}
+function openComp(unit,comp){
+ const u=UNITS.find(x=>x.id===unit),r=u?.comps[comp];if(!r)return;
+ $("c-title").innerHTML=`${esc(r.unit)} · ${esc(r.comp)} <span class="g" data-g="${LETTER[r.status]==="–"?"_":LETTER[r.status]}" style="margin-left:6px">${LETTER[r.status]}</span> <span style="color:${r.status==="Extreme"?"#f87171":COL[r.status]};font-size:13px">${r.status}</span>`;
+ $("c-body").innerHTML=`<div class="info"><div><small>Model</small><b>${esc(r.model)}</b></div><div><small>Department</small><b>${esc(r.dept)}</b></div><div><small>Current HM</small><b class="mono">${fh(r.hm)} h</b></div>
+  <div><small>Component life</small><b class="mono">${fh(r.life)} h</b></div><div><small>Target life</small><b class="mono">${fh(r.target)} h</b></div><div><small>Life used</small><b class="mono" style="color:${lifeCol(r.pct)}">${pctTxt(r.pct)}</b></div>
+  <div><small>Remaining</small><b class="mono">${fh(r.remH)} h · ${f1(r.remM)} mo</b></div><div><small>Avg schedule</small><b class="mono">${f1(r.avg)} h/day</b></div>${r.cstat?`<div><small>Component status</small><b>${esc(r.cstat)}</b></div>`:""}${r.top&&r.top!=="-"?`<div><small>Top up oil</small><b>${esc(r.top)} L</b></div>`:""}${r.rating?`<div><small>Rating</small><b>${esc(r.rating)}</b></div>`:""}</div>
+  <div class="sec"><h3>Recommended actions</h3>${r.acts.length?r.acts.map(a=>`<div class="box" style="--c:${COL[STATUS[a.lv]]}">${esc(a.t)}</div>`).join(""):`<div class="sub">${r.status==="Normal"?"No action required – continue routine monitoring.":"No condition monitoring result for this component."}</div>`}</div>
+  <div class="sec"><h3>Condition results <span class="sub" style="text-transform:none;letter-spacing:0;font-weight:500">(latest on the left · outlined = trend)</span></h3><table class="htable"><tbody>${seqHtml(r.sos,"SOS")}${seqHtml(r.mp,"Magnetic Plug")}${seqHtml(r.cf,"Cutting Filter")}
+   <tr><td><b>CTS</b></td><td colspan="2">${r.cts?g(r.cts)+" "+["Normal","Caution – please order the parts","Critical – please schedule the replacement","Extreme – replace the parts immediately"][GRADE[r.cts]]:`<span class="sub">${esc(r.ctsRaw||"No result")}</span>`}</td></tr></tbody></table></div>
+  ${r.hist?`<div class="sec"><h3>Maintenance history note</h3><div class="box" style="--c:var(--a1)">${esc(r.hist)}</div></div>`:""}
+  <div class="sec"><h3>Component change history</h3>${r.changes.length?`<table class="htable"><thead><tr><th>#</th><th>Installed at HM</th><th>Date</th></tr></thead><tbody>${r.changes.map((c,i)=>`<tr><td>${i+1}</td><td class="mono">${fh(num(c.hm))} h</td><td>${esc(c.date||"-")}</td></tr>`).join("")}</tbody></table>`:'<div class="sub">No change history.</div>'}</div>`;
+ show("m-comp")}
+function openUnit(id){
+ const u=UNITS.find(x=>x.id===id);if(!u)return;CUR_UNIT=u;const c=counts(Object.values(u.comps));
+ $("u-title").innerHTML=`${esc(u.id)} <span class="sub" style="font-size:12px;font-weight:500">· ${esc(u.model)} · ${esc(u.dept)} · HM ${fh(u.hm)} h</span>`;
+ $("u-body").innerHTML=`<div class="info">${ALLST.map(k=>`<div><small>${k}</small><b style="color:${k==="Extreme"?"#f87171":COL[k]}">${c[k]}</b></div>`).join("")}</div>
+  <div class="ugrid">${COMPS.filter(k=>u.comps[k]).sort((a,b)=>u.comps[b].lv-u.comps[a].lv).map(k=>`<div><strong>${esc(k)}</strong>${tile(u.comps[k])}</div>`).join("")}</div>`;
+ show("m-unit")}
+
+/* ============ EXPORT ============ */
+function exportCSV(recs,name){
+ if(!recs.length)return toast("Nothing to export.");
+ const cell=v=>{let s=txt(v);if(/^[=+\-@]/.test(s)&&!/^-?\d/.test(s))s="'"+s;return'"'+s.replace(/"/g,'""')+'"'};
+ const head=["Unit No.","Model","Dept","Component","Health","Current HM","Comp life (h)","Target (h)","Life %","Remaining (h)","Remaining (month)","SOS latest","SOS trend","MP latest","MP trend","CF latest","CF trend","CTS","Recommended action","Component status","Maintenance note"];
+ const rows=recs.map(r=>[r.unit,r.model,r.dept,r.comp,r.status,fh(r.hm),fh(r.life),fh(r.target),pctTxt(r.pct),fh(r.remH),f1(r.remM),r.sos?.latest||"",r.sos?.trend||"",r.mp?.latest||"",r.mp?.trend||"",r.cf?.latest||"",r.cf?.trend||"",r.cts||"",r.acts.map(a=>a.t).join(" | "),r.cstat,r.hist]);
+ const blob=new Blob(["﻿"+[head,...rows].map(r=>r.map(cell).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"});
+ const a=Object.assign(document.createElement("a"),{href:URL.createObjectURL(blob),download:name});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
+
+/* ============ INIT ============ */
+function init(){
+ const th=lsGet("kdc_theme")||"dark";document.documentElement.dataset.theme=th;$("theme").value=th;
+ $("theme").onchange=e=>{document.documentElement.dataset.theme=e.target.value;lsSet("kdc_theme",e.target.value)};
+ let tm;$("q").oninput=e=>{S.q=e.target.value.trim();clearTimeout(tm);tm=setTimeout(render,150)};
+ $("st").onchange=e=>{S.st=e.target.value;render()};$("dept").onchange=e=>{S.dept=e.target.value;render()};
+ $("sort").onchange=e=>{S.sort=e.target.value;render()};$("cmonly").onchange=e=>{S.cmonly=e.target.checked;render()};
+ $("reset-st").onclick=()=>{S.st="ALL";render()};
+ $("reset").onclick=()=>{Object.assign(S,{model:"ALL",st:"ALL",q:"",dept:"ALL",sort:"unit",cmonly:false});$("q").value="";$("sort").value="unit";$("dept").value="ALL";$("cmonly").checked=false;render()};
+ $("sync").onclick=sync;$("file").onclick=()=>$("fileIn").click();$("fileIn").onchange=e=>{const f=e.target.files[0];if(f)loadFile(f);e.target.value=""};
+ $("rules").onclick=()=>show("m-rules");
+ $("exp").onclick=()=>{const cols=new Set(compCols(visible()));exportCSV(recsOf(visible()).filter(r=>cols.has(r.comp)&&(S.st==="ALL"||r.status===S.st)),`Kideco_Component_Health_${new Date().toISOString().slice(0,10)}.csv`)};
+ $("u-exp").onclick=()=>CUR_UNIT&&exportCSV(Object.values(CUR_UNIT.comps),`Kideco_${CUR_UNIT.id}.csv`);
+ document.addEventListener("click",e=>{
+  if(e.target.closest("[data-close]")){hide(e.target.closest(".modal").id);return}
+  if(e.target.classList.contains("modal")){hide(e.target.id);return}
+  const t=e.target.closest("[data-m],[data-st],[data-comp],[data-unit],[data-cell]");if(!t)return;
+  if(t.dataset.m!==undefined){S.model=t.dataset.m;render()}
+  else if(t.dataset.st){S.st=S.st===t.dataset.st?"ALL":t.dataset.st;render()}
+  else if(t.dataset.comp)focusComp(t.dataset.comp);
+  else if(t.dataset.unit)openUnit(t.dataset.unit);
+  else if(t.dataset.cell){const i=t.dataset.cell.indexOf("|");openComp(t.dataset.cell.slice(0,i),t.dataset.cell.slice(i+1))}});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape"){const m=["m-rules","m-comp","m-unit"].find(m=>!$(m).hidden);if(m)hide(m)}});
+ // show cached data instantly, then sync
+ const c=lsGet(CACHE_KEY);if(c){try{build(parseCSV(c));SRC={at:+lsGet(CACHE_AT)||0,from:"cache"};render();chip("cached","Data: cached")}catch{}}
+ sync();
+ if(AUTO_REFRESH_MIN>0)setInterval(()=>{if(!document.hidden)sync()},AUTO_REFRESH_MIN*6e4)}
+document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init):init();
+</script>
+</body>
+</html>
