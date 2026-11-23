@@ -1,233 +1,251 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kideco · Component Health Monitoring</title>
-<meta name="theme-color" content="#060b17">
+<title>Kideco · Component Health Control Room</title>
+<meta name="theme-color" content="#14181d">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--ok:#16a34a;--cau:#eab308;--cri:#ef4444;--ext:#7f1d1d;--nd:#64748b;--a1:#38bdf8;--a2:#818cf8;--r:16px;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-[data-theme=dark]{color-scheme:dark;--bg:#060b17;--card:rgba(17,26,46,.78);--solid:#0f1a30;--line:rgba(148,163,184,.16);--tx:#f1f5ff;--sub:#8b9bb8;--hov:rgba(56,189,248,.09)}
-[data-theme=light]{color-scheme:light;--bg:#eef2f9;--card:rgba(255,255,255,.92);--solid:#fff;--line:#d9e2f0;--tx:#13223a;--sub:#5f7189;--hov:#e8f3ff}
-*{box-sizing:border-box;margin:0}
-body{background:radial-gradient(900px 500px at 5% -10%,rgba(56,189,248,.14),transparent 60%),radial-gradient(800px 500px at 100% 0,rgba(129,140,248,.12),transparent 60%),var(--bg);background-attachment:fixed;color:var(--tx);min-height:100vh;padding:clamp(10px,2vw,24px);font-size:13px}
+:root{--A:#16a34a;--B:#eab308;--C:#ef4444;--X:#7f1d1d;--N:#94a3b8;--acc:#0d9488;--acc2:#14b8a6;
+ --side:#14181d;--side2:#1d232a;--sidetx:#e7ebef;--sidesub:#8b96a3;
+ --f:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--fc:"Barlow Condensed","Arial Narrow",var(--f);--fm:"JetBrains Mono",ui-monospace,Menlo,monospace}
+[data-theme=light]{color-scheme:light;--bg:#f2f1ed;--card:#fff;--line:#e3e1db;--tx:#1b2026;--sub:#6b7280;--soft:#f7f6f3;--hov:#eef7f6;--xt:#7f1d1d}
+[data-theme=dark]{color-scheme:dark;--bg:#0d1013;--card:#161a1f;--line:#262c33;--tx:#e8ecf0;--sub:#8d98a5;--soft:#1b2026;--hov:#1a2a2a;--xt:#f87171}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--tx);font-size:13px;display:grid;grid-template-columns:248px 1fr;min-height:100vh}
 button,select,input{font:inherit;color:inherit}button{cursor:pointer;background:none;border:0}
-:focus-visible{outline:2px solid var(--a1);outline-offset:2px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(16px);box-shadow:0 10px 28px rgba(0,0,0,.12)}
-.sub{color:var(--sub)}.mono{font-variant-numeric:tabular-nums}
-.btn{border:1px solid var(--line);background:var(--solid);border-radius:11px;padding:8px 13px;font-weight:600;font-size:12px;white-space:nowrap;transition:.15s}
-.btn:hover{background:var(--hov)}.btn:disabled{opacity:.5;pointer-events:none}
-.btn.pri{background:linear-gradient(120deg,#0284c7,#6366f1);color:#fff;border-color:transparent}
-.btn.grn{background:linear-gradient(120deg,#059669,#10b981);color:#fff;border-color:transparent}
-.fld{background:var(--solid);border:1px solid var(--line);border-radius:11px;padding:8px 12px;min-height:36px}
-/* header */
-header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 18px;margin-bottom:8px}
-.brand{display:flex;gap:12px;align-items:center}
-.logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(37,99,235,.2);border:1px solid rgba(59,130,246,.3);font-size:22px}
-h1{font-size:clamp(16px,2.2vw,20px);letter-spacing:-.02em}
-.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.chip{font-size:11px;font-weight:600;padding:5px 11px;border-radius:99px;border:1px solid var(--line);color:var(--sub);display:inline-flex;gap:6px;align-items:center}
-.chip:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--nd)}
-.chip[data-s=live]:before{background:#10b981;box-shadow:0 0 8px #10b981}.chip[data-s=cached]:before{background:var(--cau)}.chip[data-s=error]:before{background:var(--cri)}.chip[data-s=busy]:before{background:var(--a1);animation:p 1s infinite}
-@keyframes p{50%{opacity:.25}}
-#meta{font-size:11px;margin:0 4px 12px}
-/* KPI */
-.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px}
-.kpi{padding:12px 14px;border-left:4px solid var(--c,var(--a1))}
-.kpi small{font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--sub)}
-.kpi b{display:block;font-size:26px;letter-spacing:-.03em;margin:2px 0;color:var(--c,var(--tx))}
-.kpi span{font-size:11px;color:var(--sub)}
-[data-theme=dark] .kpi[data-k=ext] b{color:#f87171}
+:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
+.mono{font-family:var(--fm);font-variant-numeric:tabular-nums}.sub{color:var(--sub)}
+/* ===== sidebar ===== */
+.side{background:var(--side);color:var(--sidetx);padding:18px 14px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh;overflow:auto;scrollbar-width:thin}
+.brand{display:flex;gap:10px;align-items:center;padding:0 4px}
+.brand .mk{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--acc),#0f4c47);display:grid;place-items:center;font-family:var(--fc);font-weight:700;font-size:18px;letter-spacing:.02em}
+.brand b{font-family:var(--fc);font-size:19px;letter-spacing:.03em;display:block;line-height:1}.brand small{font-size:10.5px;color:var(--sidesub);letter-spacing:.08em;text-transform:uppercase}
+.sh{font-family:var(--fc);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sidesub);margin:0 4px 8px}
+.nav{display:grid;gap:4px}
+.nav button{display:grid;grid-template-columns:1fr auto;gap:5px 8px;padding:9px 10px;border-radius:10px;text-align:left;border:1px solid transparent}
+.nav button:hover{background:var(--side2)}.nav button.on{background:var(--side2);border-color:#2f3a44;box-shadow:inset 3px 0 0 var(--acc2)}
+.nav b{font-weight:600;font-size:14px}.nav span{font-size:11px;color:var(--sidesub)}
+.mini{grid-column:1/-1;display:flex;height:5px;border-radius:9px;overflow:hidden;background:#2a323b}.mini i{display:block;height:100%}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chips button{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:8px;border:1px solid #2c343d;font-size:12px;font-weight:600;color:var(--sidetx)}
+.chips button:hover{background:var(--side2)}.chips button.on{background:#e7ebef;color:#14181d;border-color:#e7ebef}
+.side select{width:100%;background:var(--side2);border:1px solid #2c343d;border-radius:9px;padding:8px 10px;color:var(--sidetx)}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;padding:2px 4px;cursor:pointer}
+.tog input{accent-color:var(--acc2);width:16px;height:16px}
+.sfoot{margin-top:auto;display:grid;gap:8px;font-size:11px;color:var(--sidesub)}
+.sbtn{display:flex;justify-content:center;gap:6px;padding:9px;border-radius:10px;font-weight:600;font-size:12.5px;border:1px solid #2c343d;color:var(--sidetx)}
+.sbtn:hover{background:var(--side2)}.sbtn.pri{background:var(--acc);border-color:var(--acc);color:#fff}.sbtn.pri:hover{background:#0f766e}
+.sbtn:disabled{opacity:.5;pointer-events:none}.srow{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--N);margin-right:6px}
+.dot[data-s=live]{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.2)}.dot[data-s=cached]{background:var(--B)}.dot[data-s=error]{background:var(--C)}.dot[data-s=busy]{background:var(--acc2);animation:pl 1s infinite}
+@keyframes pl{50%{opacity:.3}}
+/* ===== main ===== */
+main{padding:18px 22px 30px;min-width:0}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.top h1{font-family:var(--fc);font-size:30px;font-weight:700;letter-spacing:.01em;line-height:1}
+.top .crumb{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--sub);margin-bottom:4px}
+.tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.in{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-height:38px}
+#q{width:min(320px,70vw)}
+.btn{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 13px;font-weight:600;min-height:38px}.btn:hover{background:var(--hov)}
+.btn.acc{background:var(--acc);border-color:var(--acc);color:#fff}.btn.acc:hover{background:#0f766e}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.ph h2{font-family:var(--fc);font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.ph .sub{font-size:11.5px}
+/* status strip */
+.strip{display:grid;grid-template-columns:repeat(6,1fr);margin-bottom:12px;overflow:hidden}
+.strip>div{padding:12px 16px;border-right:1px solid var(--line);position:relative}.strip>div:last-child{border-right:0}
+.strip>div:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--c,transparent)}
+.strip small{font-family:var(--fc);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);font-weight:600}
+.strip b{display:block;font-family:var(--fc);font-size:34px;font-weight:700;line-height:1.1;color:var(--c2,var(--tx))}
+.strip span{font-size:11.5px;color:var(--sub)}
+.strip>div.stack{grid-column:1/-1;display:flex;height:8px;padding:0;border-right:0}.strip>div.stack:before{display:none}.stack i{display:block;height:100%}
 /* overview */
-.row2{display:grid;grid-template-columns:minmax(300px,1.05fr) 1.4fr 1fr;gap:12px;margin-bottom:12px}
-.panel{padding:14px 16px;min-width:0}
-.panel h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--a1);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.donut{display:flex;align-items:center;gap:16px}
-.donut .cv{position:relative;width:170px;height:170px;flex:none}
-.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
-.donut svg circle{transition:stroke-width .15s;cursor:pointer}.donut svg circle:hover{stroke-width:24}
-.donut .ctr{position:absolute;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}.donut .ctr b{font-size:26px}
-.legend{display:grid;gap:6px;flex:1;min-width:0}
-.legend button{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;border:1px solid var(--line);font-weight:600;font-size:12px;text-align:left}
-.legend button:hover,.legend button.on{background:var(--hov)}.legend button.on{border-color:var(--a1)}
-.lt{display:inline-flex;align-items:center;gap:7px}.lt i{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800;color:#fff}
-.nd-note{font-size:10.5px;margin-top:8px}
-.plist{max-height:236px;overflow:auto;display:grid;gap:6px;scrollbar-width:thin;padding-right:2px}
-.pi{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;text-align:left;padding:7px 10px;border-radius:10px;border:1px solid var(--line);border-left:4px solid var(--c)}
-.pi:hover{background:var(--hov)}.pi b{font-size:12px}.pi .sub{font-size:10.5px}.pi .why{grid-column:1/-1;font-size:11px}
-.hot{display:grid;gap:6px;max-height:236px;overflow:auto;scrollbar-width:thin}
-.hot button{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;text-align:left}
-.hot button:hover{background:var(--hov)}.hot .cnt{display:flex;gap:4px}
-.cnt i{font-style:normal;font-size:10px;font-weight:800;padding:1px 6px;border-radius:99px;color:#fff}
-/* models */
-.models{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;margin-bottom:8px;scrollbar-width:thin}
-.model{flex:none;display:flex;gap:10px;align-items:center;padding:9px 14px;border-radius:13px;border:1px solid var(--line);background:var(--card);font-weight:700;text-align:left}
-.model:hover{background:var(--hov)}.model.on{background:linear-gradient(120deg,#0369a1,#6366f1);color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(99,102,241,.28)}
-.model em{font-style:normal;font-size:22px}.model small{display:block;font-size:10px;font-weight:500;opacity:.8}
-.bar{display:flex;flex-wrap:wrap;gap:8px;padding:10px;margin-bottom:12px;align-items:center}#q{flex:1;min-width:200px}
-.bar label{display:inline-flex;gap:6px;align-items:center;font-size:12px;cursor:pointer;padding:0 4px}
+.ov{display:grid;grid-template-columns:330px minmax(0,1fr) minmax(0,1.15fr);gap:12px;margin-bottom:12px}
+.pie{display:grid;justify-items:center;gap:12px;padding:14px 16px}
+.pie .cv{position:relative;width:200px;height:200px}.pie svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pie circle[data-st]{cursor:pointer;transition:opacity .15s}.pie circle[data-st]:hover{opacity:.8}
+.pie .ctr{position:absolute;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}
+.pie .ctr b{font-family:var(--fc);font-size:40px;line-height:1}.pie .ctr span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--sub)}
+.lg{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
+.lg button{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--line);border-radius:10px;text-align:left}
+.lg button:hover{background:var(--hov)}.lg button.on{border-color:var(--acc);background:var(--hov)}
+.lg b{font-family:var(--fc);font-size:20px;line-height:1;margin-left:auto}.lg small{display:block;font-size:10.5px;color:var(--sub)}
+.gr{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font-family:var(--fm);font-weight:700;font-size:12px;color:#fff;background:var(--N);flex:none}
+.gr[data-g=A]{background:var(--A)}.gr[data-g=B]{background:var(--B);color:#3b2a00}.gr[data-g=C]{background:var(--C)}.gr[data-g=X]{background:var(--X)}.gr[data-g="_"]{background:transparent;color:var(--sub);border:1px dashed var(--N)}
+.gr.s{width:15px;height:15px;font-size:9px;border-radius:4px}
+.ndn{font-size:11px;text-align:center}
+.cbars{padding:8px 16px 14px;display:grid;gap:7px;max-height:340px;overflow:auto;scrollbar-width:thin}
+.cb{display:grid;grid-template-columns:128px 1fr 34px;gap:10px;align-items:center;text-align:left;padding:3px 0}
+.cb:hover .bt{opacity:.85}.cb span{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt{display:flex;height:16px;border-radius:5px;overflow:hidden;background:var(--soft)}.bt i{display:block;height:100%}
+.cb em{font-style:normal;font-family:var(--fm);font-size:11px;color:var(--sub);text-align:right}
+.wl{padding:8px 10px 12px;display:grid;gap:7px;max-height:340px;overflow:auto;scrollbar-width:thin}
+.wi{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;text-align:left;padding:9px 11px;border-radius:11px;border:1px solid var(--line);background:var(--soft)}
+.wi:hover{border-color:var(--acc)}.wi .gr{grid-row:span 2}.wi b{font-size:13px}.wi .u{font-family:var(--fm);font-size:11.5px;color:var(--sub)}
+.wi p{grid-column:2/-1;font-size:11.5px;line-height:1.35}
+.empty{padding:24px;text-align:center;color:var(--sub)}
 /* matrix */
-.wrap{max-height:75vh;overflow:auto;scrollbar-width:thin;overscroll-behavior:contain}
+.mx{overflow:hidden}.wrap{max-height:78vh;overflow:auto;scrollbar-width:thin;overscroll-behavior:contain}
 table{border-collapse:separate;border-spacing:0;width:100%}
-th{position:sticky;top:0;z-index:5;background:var(--solid);color:var(--sub);font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
-th.hl{color:var(--cau)}
-td{padding:5px;vertical-align:top;border-bottom:1px solid var(--line)}
-.ca{position:sticky;left:0;z-index:4;background:var(--solid);width:170px;min-width:170px;border-right:1px solid var(--line);padding:10px}
-th.ca{z-index:6;text-align:left;color:var(--a1)}
-.cc{width:196px;min-width:196px}
-tr:hover td{background:var(--hov)}tr:hover td.ca{background:var(--solid)}
-.uid{font-weight:800;color:var(--a1);font-size:14px;text-align:left;display:block}.uid:hover{text-decoration:underline}
-.ui{font-size:10.5px;margin-top:2px;line-height:1.45}
-.ucnt{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+th{position:sticky;top:0;z-index:5;background:var(--card);font-family:var(--fc);font-weight:700;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);padding:11px 8px;border-bottom:2px solid var(--line);white-space:nowrap;text-align:left}
+th.hl{color:var(--acc);border-bottom-color:var(--acc)}
+td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
+.uc{position:sticky;left:0;z-index:4;background:var(--card);width:176px;min-width:176px;border-right:1px solid var(--line);padding:12px}
+th.uc{z-index:6;color:var(--acc)}
+.cc{width:200px;min-width:200px}
+.un{font-family:var(--fc);font-size:21px;font-weight:700;letter-spacing:.02em;text-align:left;line-height:1}.un:hover{color:var(--acc)}
+.um{font-size:11px;color:var(--sub);margin:3px 0 8px;line-height:1.45}
+.hs{display:flex;flex-wrap:wrap;gap:2px}.hs i{width:9px;height:9px;border-radius:2px;background:var(--N);opacity:.9}
 /* tile */
-.tile{--c:var(--ok);display:flex;flex-direction:column;gap:5px;width:100%;min-height:150px;padding:8px 10px;border-radius:12px;text-align:left;
- border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-left:5px solid var(--c);
- background:color-mix(in srgb,var(--c) var(--mix,16%),var(--solid));font-size:10.5px;line-height:1.3;transition:transform .15s,box-shadow .15s}
-.tile:hover{transform:translateY(-2px);box-shadow:0 8px 20px color-mix(in srgb,var(--c) 30%,transparent)}
-.tile[data-s=Caution]{--c:var(--cau);--mix:24%}
-.tile[data-s=Critical]{--c:var(--cri);--mix:32%}
-.tile[data-s=Extreme]{--c:var(--ext);--mix:100%;color:#fff;border-left-color:#450a0a}
-.tile[data-s="No Data"]{--c:var(--nd);--mix:6%;border-style:dashed;border-left-style:solid}
-.tile.dim{opacity:.18;filter:grayscale(1)}
-.tile.ph{min-height:60px;opacity:.4;border-style:dashed;--c:var(--nd);--mix:0%;justify-content:center;align-items:center}
-.th{display:flex;justify-content:space-between;align-items:center;gap:6px}
-.th b{font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
-.tile[data-s=Normal] .th b{color:#22c55e}.tile[data-s=Caution] .th b{color:#ca8a04}[data-theme=dark] .tile[data-s=Caution] .th b{color:#facc15}.tile[data-s=Critical] .th b{color:#dc2626}[data-theme=dark] .tile[data-s=Critical] .th b{color:#fca5a5}.tile[data-s="No Data"] .th b{color:var(--sub)}
-.life{display:grid;gap:3px}
-.life .l1{display:flex;justify-content:space-between;gap:4px}
-.lb{height:5px;border-radius:9px;background:rgba(127,140,160,.25);overflow:hidden}.lb i{display:block;height:100%;border-radius:9px}
-.over{font-weight:800;color:#dc2626}.tile[data-s=Extreme] .over,[data-theme=dark] .over{color:#fca5a5}
-.cm{display:grid;grid-template-columns:30px auto 1fr;gap:3px 6px;align-items:center;padding-top:5px;border-top:1px solid color-mix(in srgb,currentColor 14%,transparent)}
-.cm>span:nth-child(3n+1){font-weight:700;font-size:9.5px;opacity:.75}
-.g{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:5px;font-weight:800;font-size:10px;color:#fff;background:var(--nd)}
-.g[data-g=A]{background:#16a34a}.g[data-g=B]{background:#eab308;color:#422006}.g[data-g=C]{background:#ef4444}.g[data-g=X]{background:#7f1d1d;box-shadow:inset 0 0 0 1.5px #fca5a5}
-.tr{display:inline-flex;gap:2px;align-items:center}.tr .g{width:13px;height:13px;font-size:8px;border-radius:4px;opacity:.9}
-.tr small{font-size:9px;opacity:.7;margin-right:3px}
-.act{font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.tf{margin-top:auto;display:flex;flex-wrap:wrap;gap:4px}
-.pill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(127,140,160,.22);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.pill.y{background:linear-gradient(120deg,#fde68a,#fbbf24);color:#78350f}
-/* modal */
-.modal{position:fixed;inset:0;z-index:50;background:rgba(2,6,23,.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:12px}
-.modal[hidden]{display:none}
-.dlg{width:min(97vw,var(--w,900px));max-height:94vh;overflow:auto;background:var(--solid);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 30px 70px rgba(0,0,0,.45)}
-.dh{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
-.dh h2{font-size:16px}
-.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:12px;border-radius:13px;background:rgba(100,116,139,.09);margin-bottom:14px}
-.info small{display:block;font-size:9.5px;text-transform:uppercase;color:var(--sub);font-weight:700;margin-bottom:2px}
-.sec{margin-bottom:14px}.sec h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--a1);margin-bottom:8px}
-.seq{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
-.box{border-radius:12px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 12%,transparent);padding:8px 11px;margin-bottom:6px;font-size:12px;border-left:5px solid var(--c)}
-.htable{width:100%;font-size:12px}.htable td,.htable th{position:static;padding:6px 8px;text-align:left}
-.ugrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}.ugrid strong{display:block;font-size:10px;color:var(--sub);text-transform:uppercase;margin-bottom:4px}
-#toast{position:fixed;right:16px;bottom:18px;z-index:90;max-width:min(420px,92vw);padding:12px 16px;border-radius:12px;background:#18304e;color:#fff;border:1px solid #3b82f6;box-shadow:0 18px 46px rgba(0,0,0,.45)}#toast[hidden]{display:none}
-.rules{font-size:11px;line-height:1.55}.rules li{margin-left:16px}
-@media(max-width:1200px){.row2{grid-template-columns:1fr 1fr}.row2>.panel:first-child{grid-column:1/-1}.kpis{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:720px){.row2{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.ca{width:120px;min-width:120px}.donut{flex-direction:column}}
+.tile{--c:var(--A);--t:#fff;display:flex;flex-direction:column;width:100%;min-height:158px;text-align:left;border-radius:11px;overflow:hidden;border:1px solid color-mix(in srgb,var(--c) 40%,var(--line));background:color-mix(in srgb,var(--c) var(--m,8%),var(--card));transition:transform .12s,box-shadow .12s}
+.tile:hover{transform:translateY(-2px);box-shadow:0 8px 18px color-mix(in srgb,var(--c) 28%,transparent)}
+.tile[data-s=Caution]{--c:var(--B);--t:#3b2a00;--m:14%}.tile[data-s=Critical]{--c:var(--C);--m:16%}.tile[data-s=Extreme]{--c:var(--X);--m:30%}.tile[data-s="No Data"]{--c:var(--N);--t:#fff;--m:0%;border-style:dashed}
+.tile.dim{opacity:.15;filter:grayscale(1)}
+.th{display:flex;justify-content:space-between;align-items:center;gap:6px;background:var(--c);color:var(--t);padding:5px 9px}
+.th b{font-family:var(--fc);font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+.th .gr{background:rgba(255,255,255,.22);color:inherit;width:20px;height:20px}
+.tile[data-s="No Data"] .th{background:var(--soft);color:var(--sub)}
+.tb2{padding:7px 9px 8px;display:flex;flex-direction:column;gap:6px;flex:1;font-size:11px}
+.lf{display:grid;grid-template-columns:1fr auto;gap:2px 6px;align-items:baseline}
+.lf .pc{font-family:var(--fc);font-size:19px;font-weight:700;line-height:1}
+.lf .bar{grid-column:1/-1;position:relative;height:6px;border-radius:9px;background:color-mix(in srgb,var(--tx) 10%,transparent);overflow:visible}
+.lf .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:9px}.lf .bar u{position:absolute;right:0;top:-3px;bottom:-3px;width:2px;background:var(--tx);opacity:.35}
+.lf small{grid-column:1/-1;color:var(--sub);font-size:10.5px}
+.ovr{color:#dc2626}[data-theme=dark] .ovr{color:#f87171}
+.rs{display:grid;gap:4px}
+.rr{display:grid;grid-template-columns:28px auto 1fr;gap:6px;align-items:center}
+.rr>span:first-child{font-family:var(--fc);font-weight:700;font-size:11.5px;letter-spacing:.04em;color:var(--sub)}
+.rr .tr{display:flex;gap:2px;align-items:center;font-size:9.5px;color:var(--sub)}
+.rec{font-size:11px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;padding-top:6px;border-top:1px dashed color-mix(in srgb,var(--c) 50%,var(--line))}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto}
+.tag{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;background:color-mix(in srgb,var(--tx) 9%,transparent);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag.w{background:#fde68a;color:#78350f}
+.ph0{min-height:52px;border:1px dashed var(--line);border-radius:11px;display:grid;place-items:center;color:var(--sub)}
+#count{font-size:11.5px;color:var(--sub);padding:10px 16px}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,12,15,.5);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(720px,100vw);background:var(--card);z-index:50;transform:translateX(102%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:-20px 0 50px rgba(0,0,0,.25)}
+.drawer.on{transform:none}.drawer.wide{width:min(1180px,100vw)}
+.dh{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.dh .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--sub)}.dh h2{font-family:var(--fc);font-size:26px;line-height:1.1}
+.db{padding:16px 20px 30px;overflow:auto;flex:1}
+.hero{display:flex;gap:14px;align-items:center;padding:14px;border-radius:12px;background:var(--c);color:var(--t,#fff);margin-bottom:14px}
+.hero .gr{width:46px;height:46px;font-size:24px;background:rgba(255,255,255,.2);color:inherit}
+.hero b{font-family:var(--fc);font-size:22px;letter-spacing:.05em;text-transform:uppercase;display:block}.hero p{font-size:12.5px;opacity:.95}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.kv div{background:var(--card);padding:9px 12px}.kv small{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:2px}.kv b{font-size:14px}
+.sec{margin-bottom:18px}.sec>h3{font-family:var(--fc);font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.ai{border:1px solid color-mix(in srgb,var(--acc) 35%,var(--line));border-radius:12px;overflow:hidden}
+.ai .aih{background:color-mix(in srgb,var(--acc) 10%,var(--card));padding:10px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.ai .aih b{font-size:13.5px}.badge{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--acc);color:#fff}
+.ai .aib{padding:12px 14px;display:grid;gap:12px}
+.ai h4{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--sub);margin-bottom:5px}
+.ai ul{list-style:none;display:grid;gap:5px}.ai li{padding-left:16px;position:relative;line-height:1.45}.ai li:before{content:"›";position:absolute;left:3px;color:var(--acc);font-weight:700}
+.chk{display:grid;gap:4px}.chk label{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start;padding:6px 8px;border-radius:8px;cursor:pointer;line-height:1.45}
+.chk label:hover{background:var(--soft)}.chk input{margin-top:3px;accent-color:var(--acc)}.chk input:checked+span{text-decoration:line-through;color:var(--sub)}
+.chk .ex{border-left:3px solid var(--X);background:color-mix(in srgb,var(--X) 7%,transparent)}
+.timing{display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:10px;background:color-mix(in srgb,var(--c) 12%,var(--card));border:1px solid color-mix(in srgb,var(--c) 40%,var(--line));font-weight:600}
+.disc{font-size:11px;color:var(--sub);line-height:1.5;padding:8px 14px;border-top:1px solid var(--line)}
+.seq{display:flex;flex-wrap:wrap;gap:3px}.seq .gr.t{outline:2px solid var(--acc);outline-offset:1px}
+.ht{width:100%;font-size:12.5px}.ht th,.ht td{position:static;padding:7px 9px;text-align:left;border-bottom:1px solid var(--line);font-size:12px}
+.ht th{font-size:11px;background:var(--soft)}
+.ug{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:10px}.ug h5{font-family:var(--fc);font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--sub);margin-bottom:4px}
+.rules{line-height:1.6;font-size:12.5px}.rules ul{margin:4px 0 10px 18px}
+#toast{position:fixed;right:18px;bottom:18px;z-index:90;max-width:min(420px,92vw);padding:12px 16px;border-radius:12px;background:#14181d;color:#fff;border-left:4px solid var(--acc2);box-shadow:0 18px 46px rgba(0,0,0,.35)}#toast[hidden]{display:none}
+@media(max-width:1350px){.ov{grid-template-columns:300px 1fr}.ov>.wlp{grid-column:1/-1}.strip{grid-template-columns:repeat(3,1fr)}.strip>div:nth-child(3){border-right:0}.strip>div:nth-child(-n+3){border-bottom:1px solid var(--line)}}
+@media(max-width:900px){body{grid-template-columns:1fr}.side{position:static;height:auto}.ov{grid-template-columns:1fr}.strip{grid-template-columns:repeat(2,1fr)}.uc{width:120px;min-width:120px}.sfoot{margin-top:0}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{.side,.tb,.scrim,.drawer{display:none!important}body{display:block}}
 </style>
 </head>
 <body>
-<header class="card">
-  <div class="brand"><div class="logo">🚜</div><div><h1>Kideco Component Health Monitoring</h1><div class="sub" style="font-size:11px">Component Life · SOS · Magnetic Plug · Cutting Filter · CTS</div></div></div>
-  <div class="tools">
-    <span class="chip" id="chip">Data: waiting</span>
-    <select id="theme" class="fld" aria-label="Theme"><option value="dark">🌙 Dark</option><option value="light">☀️ Light</option></select>
-    <button id="rules" class="btn">ℹ Rules</button>
-    <button id="file" class="btn" title="Load a .xlsx or .csv file instead of Google Sheets">📂 Load file</button>
-    <button id="sync" class="btn pri">🔄 Sync</button>
+<aside class="side">
+  <div class="brand"><div class="mk">KD</div><div><b>KIDECO</b><small>Component Health</small></div></div>
+  <div><div class="sh">Fleet / Model</div><div class="nav" id="nav"></div></div>
+  <div><div class="sh">Health status</div><div class="chips" id="stchips"></div></div>
+  <div><div class="sh">Department</div><select id="dept"><option value="ALL">All departments</option></select></div>
+  <div style="display:grid;gap:8px">
+    <label class="tog">Monitored components only <input type="checkbox" id="cmonly"></label>
+    <label class="tog">Dark mode <input type="checkbox" id="dark"></label>
+  </div>
+  <div class="sfoot">
+    <div><span class="dot" id="dot"></span><span id="chip">Waiting for data</span></div>
+    <div id="meta" style="line-height:1.45">—</div>
+    <button class="sbtn pri" id="sync">⟳ Sync Google Sheets</button>
+    <div class="srow"><button class="sbtn" id="file">Load file</button><button class="sbtn" id="rules">Rules</button></div>
     <input id="fileIn" type="file" accept=".csv,.xlsx,.xls" hidden>
   </div>
-</header>
-<div id="meta" class="sub">Loading data from Google Sheets…</div>
+</aside>
 
-<section class="kpis">
-  <div class="card kpi" style="--c:var(--a1)"><small>Units</small><b id="k-units">—</b><span id="k-units-n">&nbsp;</span></div>
-  <div class="card kpi" data-k="ext" style="--c:var(--ext)"><small>Extreme</small><b id="k-ext">—</b><span id="k-ext-n">&nbsp;</span></div>
-  <div class="card kpi" style="--c:var(--cri)"><small>Critical</small><b id="k-cri">—</b><span id="k-cri-n">&nbsp;</span></div>
-  <div class="card kpi" style="--c:var(--cau)"><small>Caution</small><b id="k-cau">—</b><span id="k-cau-n">&nbsp;</span></div>
-  <div class="card kpi" style="--c:var(--ok)"><small>Normal</small><b id="k-ok">—</b><span id="k-ok-n">&nbsp;</span></div>
-  <div class="card kpi" style="--c:#a855f7"><small>Over target life</small><b id="k-over">—</b><span id="k-over-n">&nbsp;</span></div>
-</section>
+<main>
+  <div class="top">
+    <div><div class="crumb" id="crumb">Fleet overview</div><h1 id="title">All Fleet</h1></div>
+    <div class="tb">
+      <input id="q" class="in" placeholder="Search unit, component, remark…" autocomplete="off">
+      <select id="sort" class="in"><option value="unit">Sort: Unit A–Z</option><option value="risk">Sort: Highest risk</option><option value="life">Sort: Highest life %</option></select>
+      <button class="btn" id="reset">Reset</button>
+      <button class="btn acc" id="exp">Export CSV</button>
+    </div>
+  </div>
 
-<section class="row2">
-  <div class="card panel"><h2>Fleet health <span id="chart-lbl" class="sub">ALL</span></h2>
-    <div class="donut"><div class="cv"><svg viewBox="0 0 200 200" id="pie"></svg><div class="ctr"><b id="pct">–</b><span class="sub" style="font-size:10px">Normal</span></div></div><div class="legend" id="legend"></div></div>
-    <div class="nd-note sub" id="nd-note"></div></div>
-  <div class="card panel"><h2>Priority actions <span id="p-n" class="sub"></span></h2><div class="plist" id="plist"></div></div>
-  <div class="card panel"><h2>Hotspot components <button id="reset-st" class="btn" hidden style="padding:3px 9px">Clear filter</button></h2><div class="hot" id="hot"></div></div>
-</section>
+  <section class="panel strip" id="strip"></section>
 
-<div class="models" id="models"></div>
+  <section class="ov">
+    <div class="panel"><div class="ph"><h2>Health distribution</h2><span class="sub" id="pie-lbl"></span></div>
+      <div class="pie"><div class="cv"><svg viewBox="0 0 200 200" id="pie"></svg><div class="ctr"><b id="pct">–</b><span>Normal</span></div></div><div class="lg" id="legend"></div><div class="ndn sub" id="ndn"></div></div></div>
+    <div class="panel"><div class="ph"><h2>By component</h2><span class="sub">click to locate</span></div><div class="cbars" id="cbars"></div></div>
+    <div class="panel wlp"><div class="ph"><h2>Critical &amp; Extreme worklist</h2><span class="sub" id="wl-n"></span></div><div class="wl" id="wl"></div></div>
+  </section>
 
-<section class="card bar">
-  <input id="q" class="fld" placeholder="🔍 Search unit, component, remark…" autocomplete="off">
-  <select id="st" class="fld"><option value="ALL">All statuses</option><option>Extreme</option><option>Critical</option><option>Caution</option><option>Normal</option><option>No Data</option></select>
-  <select id="dept" class="fld"><option value="ALL">All departments</option></select>
-  <select id="sort" class="fld"><option value="unit">Unit A–Z</option><option value="risk">Highest risk</option><option value="life">Highest life %</option></select>
-  <label><input type="checkbox" id="cmonly"> Monitored components only</label>
-  <button id="reset" class="btn">Reset</button>
-  <button id="exp" class="btn grn">↓ Export CSV</button>
-</section>
+  <section class="panel mx">
+    <div class="wrap"><table><thead id="head"></thead><tbody id="body"><tr><td class="empty">Loading…</td></tr></tbody></table></div>
+    <div id="count"></div>
+  </section>
+</main>
 
-<section class="card" style="overflow:hidden">
-  <div class="wrap"><table><thead id="head"></thead><tbody id="body"><tr><td class="sub" style="padding:30px;text-align:center">Loading…</td></tr></tbody></table></div>
-</section>
-<div id="count" class="sub" style="font-size:11px;margin:8px 4px"></div>
-
-<div class="modal" id="m-comp" hidden><div class="dlg" style="--w:860px"><div class="dh"><h2 id="c-title"></h2><button class="btn" data-close>✕</button></div><div id="c-body"></div></div></div>
-<div class="modal" id="m-unit" hidden><div class="dlg" style="--w:1200px"><div class="dh"><h2 id="u-title"></h2><div class="tools"><button class="btn grn" id="u-exp">↓ CSV</button><button class="btn" data-close>✕</button></div></div><div id="u-body"></div></div></div>
-<div class="modal" id="m-rules" hidden><div class="dlg" style="--w:640px"><div class="dh"><h2>ℹ Health status rules</h2><button class="btn" data-close>✕</button></div>
-  <div class="rules">
-   <p><b>Reading results:</b> results are read from the <b>left</b>. Example <code>XBBACC</code> → latest result <b>X</b>, trend (last 3) <b>X B B</b>. “_” means no sample.</p><br>
-   <p><b>SOS / Magnetic Plug / Cutting Filter (latest result)</b></p>
-   <ul><li><span class="g" data-g="X">X</span> Extreme (dark red)</li><li><span class="g" data-g="C">C</span> Critical (red)</li><li><span class="g" data-g="B">B</span> Caution (yellow)</li><li><span class="g" data-g="A">A</span> Normal (green)</li></ul><br>
-   <p><b>Combined rule:</b> if latest SOS = B <b>and</b> Magnetic Plug = B <b>and</b> Cutting Filter = B → component becomes <b>Critical</b>.</p><br>
-   <p><b>CTS</b></p>
-   <ul><li>A → Normal</li><li>B → Caution · <i>Please order the parts</i></li><li>C → Critical · <i>Please schedule the replacement</i></li><li>X → Extreme · <i>Replace the parts immediately</i></li></ul><br>
-   <p><b>Component status</b> = the worst result of SOS, Magnetic Plug, Cutting Filter, CTS and the combined rule. Components with none of these results are <b>No Data</b> and are not counted in the pie chart. Component life % is shown separately (purple KPI) and does not change the health status.</p>
-  </div></div></div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"><div class="dh"><div id="d-head"></div><div style="display:flex;gap:6px"><button class="btn" id="d-exp" hidden>Export CSV</button><button class="btn" id="d-close">✕</button></div></div><div class="db" id="d-body"></div></aside>
 <div id="toast" role="alert" hidden></div>
 
 <script>
 "use strict";
-/* ============ CONFIG ============ */
+/* ================= CONFIG ================= */
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQFViqCz82vKSPMwDaN5XwKbyp4xaJpHbkiLXAngXksFhZweanwRfaR3YLu0jI0qA/pub?output=csv";
-const AUTO_REFRESH_MIN=10;            // auto re-sync interval (minutes), 0 = off
-const CACHE_KEY="kdc_csv_v1",CACHE_AT="kdc_csv_at";
+const AUTO_REFRESH_MIN=10;
+const CACHE_KEY="kdc2_csv",CACHE_AT="kdc2_csv_at";
 
-/* ============ CONSTANTS ============ */
+/* ================= CONSTANTS ================= */
 const STATUS=["Normal","Caution","Critical","Extreme"],ALLST=[...STATUS,"No Data"];
-const COL={Normal:"#16a34a",Caution:"#eab308",Critical:"#ef4444",Extreme:"#7f1d1d","No Data":"#64748b"};
-const LETTER={Normal:"A",Caution:"B",Critical:"C",Extreme:"X","No Data":"–"};
+const COL={Normal:"#16a34a",Caution:"#eab308",Critical:"#ef4444",Extreme:"#7f1d1d","No Data":"#94a3b8"};
+const LET={Normal:"A",Caution:"B",Critical:"C",Extreme:"X","No Data":"_"};
 const GRADE={A:0,B:1,C:2,X:3};
-const SRC_TXT={
- SOS:["","SOS Caution – shorten sampling interval and monitor trend","SOS Critical – resample and inspect component, plan corrective action","SOS Extreme – stop the unit and inspect component immediately"],
- MP:["","Magnetic plug Caution – check debris at next service","Magnetic plug Critical – inspect for internal wear","Magnetic plug Extreme – heavy debris, inspect component immediately"],
- CF:["","Cutting filter Caution – check filter debris at next service","Cutting filter Critical – inspect for internal wear","Cutting filter Extreme – heavy debris, inspect component immediately"],
- CTS:["","CTS Caution – please order the parts","CTS Critical – please schedule the replacement","CTS Extreme – replace the parts immediately"]};
-const COMBO_TXT="SOS, Magnetic Plug & Cutting Filter all B – escalated to Critical, inspect component";
 const S={model:"ALL",st:"ALL",q:"",dept:"ALL",sort:"unit",cmonly:false};
-let RECS=[],UNITS=[],COMPS=[],SRC={at:0,from:""},CUR_UNIT=null;
+let RECS=[],UNITS=[],COMPS=[],SRC={at:0},CUR=null;
 
-/* ============ HELPERS ============ */
+/* ================= HELPERS ================= */
 const $=id=>document.getElementById(id),txt=v=>String(v??"").trim();
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const nk=s=>txt(s).toLowerCase().replace(/[^a-z0-9]/g,"");
 const lsGet=k=>{try{return localStorage.getItem(k)}catch{return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch{}};
 const natural=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"});
+const uniq=a=>[...new Set(a)];
 function toast(m){const e=$("toast");e.textContent=m;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,5000)}
-function chip(s,t){const e=$("chip");e.dataset.s=s;e.textContent=t}
+function chip(s,t){$("dot").dataset.s=s;$("chip").textContent=t}
 function num(v){let s=txt(v).replace(/%$/,"").replace(/\s/g,"");if(!s||!/^[+-]?[\d.,]+$/.test(s))return NaN;
- if(s.includes(".")&&s.includes(","))s=s.replace(/,/g,"");else if(s.includes(",")){const p=s.split(",");s=p.length===2&&p[1].length!==3?p.join("."):p.join("")}
- return Number(s)}
+ if(s.includes(".")&&s.includes(","))s=s.replace(/,/g,"");else if(s.includes(",")){const p=s.split(",");s=p.length===2&&p[1].length!==3?p.join("."):p.join("")}return Number(s)}
 const fh=n=>Number.isFinite(n)?Math.round(n).toLocaleString("en-US"):"–";
 const f1=n=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:1}):"–";
 const pctTxt=p=>Number.isFinite(p)?Math.round(p*100)+"%":"–";
-const lifeCol=p=>!Number.isFinite(p)?"#64748b":p>=1?"#dc2626":p>=.85?"#f59e0b":"#22c55e";
-const g=(l,extra="")=>`<span class="g" data-g="${l}"${extra}>${l==="_"?"·":l}</span>`;
+const lifeCol=p=>!Number.isFinite(p)?"#94a3b8":p>=1?"#dc2626":p>=.85?"#f59e0b":"#16a34a";
+const gr=(l,cls="")=>`<span class="gr ${cls}" data-g="${l}">${l==="_"?"·":l}</span>`;
 
-/* ============ CSV PARSER ============ */
+/* ================= CSV ================= */
 function parseCSV(t){const rows=[];let row=[],f="",q=false;
  for(let i=0;i<t.length;i++){const c=t[i];
   if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
@@ -235,201 +253,346 @@ function parseCSV(t){const rows=[];let row=[],f="",q=false;
   else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}else f+=c}
  if(f||row.length){row.push(f);rows.push(row)}return rows}
 
-/* ============ GRADE / STATUS LOGIC ============ */
-// results are read from the LEFT: first letter = latest sample, first 3 = trend
+/* ================= GRADING (results read from the LEFT) ================= */
 function grade(raw){const t=txt(raw).toUpperCase();if(!t||["-","NA","N/A","#N/A"].includes(t))return null;
  const seq=t.replace(/[^ABCX_]/g,"");const l=(seq.match(/[ABCX]/)||[])[0];if(!l)return null;
  return{seq,latest:l,trend:seq.slice(0,3)}}
-function ctsGrade(raw){const t=txt(raw).toUpperCase();return GRADE[t]!==undefined&&t.length===1?t:null}
+const ctsGrade=raw=>{const t=txt(raw).toUpperCase();return t.length===1&&GRADE[t]!==undefined?t:null};
+const CAUTION_TXT={SOS:"Oil analysis Caution – shorten sampling interval and watch the trend",MP:"Magnetic plug Caution – re-inspect debris at next service",CF:"Filter cut Caution – re-inspect filter debris at next change",CTS:"CTS Caution – please order the parts"};
+
+/* ================================================================
+   AI RECOMMENDATION KNOWLEDGE BASE
+   Written from a Cat condition-monitoring / reliability viewpoint.
+   Used for Critical (C) and Extreme (X) results.
+   ================================================================ */
+const GROUPS=[["engine",/^engine/i],["trans",/transmission|torque/i],["fd",/final drive/i],["hyd",/hydraulic|cyl\.?\s|cylinder/i],["track",/track link/i],["uc",/idler|roller|sprocket/i]];
+const groupOf=c=>(GROUPS.find(g=>g[1].test(c))||["other"])[0];
+const KB={
+ engine:{sys:"engine oil",
+  head:{SOS:["Inspect engine: confirm wear source – cut oil filter, check air intake, coolant & fuel dilution","STOP – park unit. Engine oil Extreme: cut filter, check for coolant/dirt, borescope before restart"],
+        CF:["Engine filter debris Critical – identify metal type, correlate with S·O·S, inspect bearings/air intake","STOP – heavy metal in engine filter. Park unit, identify debris, plan engine teardown/exchange"],
+        MP:["Engine magnetic debris Critical – inspect gear train/camshaft area","STOP – heavy ferrous debris, park unit and inspect engine"]},
+  concern:"Abnormal engine oil condition – possible internal wear (bearings, liners/rings, gear train), dirt ingress through the air intake, coolant leak into oil, fuel dilution or degraded oil.",
+  checks:{
+   SOS:["Read the full S·O·S report: wear metals (Fe, Cr, Al, Cu, Pb, Sn), Si/Al ratio (dirt), Na/K & glycol (coolant), fuel dilution, soot, water, viscosity, oxidation/nitration.",
+    "Take a confirmation resample within 50 SMU – warm engine, from the S·O·S sampling valve, before any top-up – to rule out a bad sample.",
+    "Air induction: air filter elements & seals, restriction indicator, intake pipes, hoses and clamps after the filter, turbo inlet for dust tracks.",
+    "Cooling system: coolant loss history, pressure-test radiator cap/system, oil cooler and aftercooler, check head gasket/liner seals if Na, K or glycol are present.",
+    "Fuel system: if fuel dilution or low viscosity – check injector seals/O-rings and fuel injection pump/transfer pump seal leakage.",
+    "Measure crankcase blow-by and review oil top-up records (consumption) and external leaks.",
+    "Cut the engine oil filter and inspect the media for bearing material, aluminium or ferrous debris; correlate with the S·O·S wear metals."],
+   CF:["Cut and open the filter; inspect pleats under light/magnifier and with a magnet.",
+    "Bright copper/bronze flakes → main/rod bearings or bushings; grey/silver non-magnetic → aluminium (pistons, turbo bearing, front housing); magnetic steel → camshaft, lifters, gear train, crankshaft.",
+    "Non-metallic particles → seal/gasket material or dirt; record quantity and photograph for trending.",
+    "Correlate with the latest S·O·S result and check oil pressure (Cat ET) at low and high idle."],
+   MP:["Inspect magnetic debris: fine paste = normal; slivers/flakes/chips = gear train, camshaft or follower distress.",
+    "Record size and quantity, photograph and compare with previous inspections."]},
+  extreme:["Park the unit – do not operate until the cause is confirmed.",
+   "If coolant/glycol is confirmed in the oil: do NOT restart (risk of bearing seizure); drain oil, fix the leak, change filters and re-flush.",
+   "Check engine oil pressure and crankshaft end play; borescope cylinders for liner scuffing, ring/piston damage.",
+   "If debris confirms internal wear, plan engine removal / exchange (Reman) before a catastrophic failure."],
+  el:{Fe:"cylinder liners, crankshaft, camshaft, gear train, valve train",Cr:"piston rings",Al:"pistons, turbo bearing, front gear housing (also dirt with Si)",Cu:"bearings/bushings or oil cooler leaching",Pb:"main/rod bearing overlay",Sn:"bearing overlay",Si:"dirt ingress through air intake / sampling contamination",Na:"coolant leak (also check K)",K:"coolant leak",Ni:"valve train / turbo",Mo:"piston ring coating or oil additive"}},
+ trans:{sys:"power train oil",
+  head:{SOS:["Inspect transmission/TC: cut filter & screens, clutch pressure + stall test, check for dirt/water ingress","STOP – park unit. Power train Extreme: drain & inspect debris, plan transmission/TC removal"],
+        MP:["Transmission magnetic plug Critical – chips/flakes indicate gear or bearing distress; inspect & pressure test","STOP – heavy ferrous debris, park unit; plan transmission removal"],
+        CF:["Transmission filter Critical – check for clutch friction material/bronze; pressure & stall test","STOP – heavy debris in filter, park unit; plan transmission removal"]},
+  concern:"Abnormal power train condition – possible planetary gear/bearing wear, clutch disc/plate wear, bushing/thrust washer wear, torque converter wear or contamination (dirt/water).",
+  checks:{
+   SOS:["Read the S·O·S report: Fe (gears/bearings), Cu (clutch plates, bushings, thrust washers, oil cooler), Al (pump, TC parts), Si (dirt), water, viscosity.",
+    "Resample within 50 SMU from the same point at operating temperature to confirm.",
+    "Cut the power train filter and inspect the magnetic screen / case drain screen.",
+    "Perform clutch pressure tests and a torque converter stall test with Cat ET / pressure taps; compare with spec.",
+    "Check shift quality, slipping, delayed engagement and power train oil temperature history.",
+    "Check breather, fill cap, dipstick tube and oil cooler for water or dirt ingress; check oil level and leaks."],
+   MP:["Inspect the magnetic plug: fine fuzzy paste = normal wear; slivers, flakes or chips = gear tooth pitting/spalling or bearing distress.",
+    "Measure/estimate particle size and quantity, photograph and compare with previous inspection.",
+    "Correlate with S·O·S Fe trend and perform a clutch pressure test."],
+   CF:["Open the filter: fibrous/paper material → clutch friction discs; bronze → thrust washers/bushings; steel flakes → gears/bearings.",
+    "Correlate with S·O·S Cu/Fe and check clutch pressures / shift slip."]},
+  extreme:["Park the unit – continued operation can damage planetary sets, case and torque converter.",
+   "Drain oil and inspect the sump/screens for large debris immediately.",
+   "If chips or friction material are confirmed, plan transmission / torque converter removal (exchange component) and flush the oil cooler and lines."],
+  el:{Fe:"planetary gears, bearings, shafts",Cu:"clutch plates, bushings, thrust washers or oil cooler",Al:"pump body, torque converter stator/housing",Pb:"bushing/bearing material",Si:"dirt ingress – breather, fill cap, seals",Na:"water/coolant ingress via oil cooler",Cr:"bearings",Sn:"bushings / bearing material"}},
+ fd:{sys:"final drive oil",
+  head:{SOS:["Inspect final drive: Duo-Cone seals, oil level/water/mud, magnetic plug & temperature","STOP – park unit. Final drive Extreme: drain & inspect debris, plan final drive overhaul"],
+        MP:["Final drive magnetic plug Critical – gear/bearing distress; inspect seals, temperature, end play","STOP – heavy debris on magnetic plug, park unit; plan final drive removal"],
+        CF:["Final drive debris Critical – inspect seals and bearings","STOP – park unit and inspect final drive"]},
+  concern:"Abnormal final drive condition – planetary gear/bearing wear, often driven by contamination from a leaking Duo-Cone floating seal (mud, water) or low oil level.",
+  checks:{
+   SOS:["Read the S·O·S report: Fe (gears/bearings), Si + Al (dirt ingress – typical of Duo-Cone seal failure), water, Cr/Ni (bearings), viscosity.",
+    "Resample within 50 SMU at operating temperature from the same drain point.",
+    "Inspect Duo-Cone floating seals at the sprocket hub for oil leakage, packed mud, or wire/debris wrapped around the seal area.",
+    "Check oil level, breather and drain/fill plugs; look for water or mud in the drained oil.",
+    "Drain and inspect the magnetic plug for chips/flakes.",
+    "Compare final drive temperature LH vs RH with an IR gun; listen for noise; check sprocket hub bearing end play."],
+   MP:["Inspect the magnetic plug: fine paste = normal; slivers/flakes/chips = gear or bearing spalling.",
+    "Compare LH vs RH debris and S·O·S; check Duo-Cone seal leakage and hub end play.",
+    "Photograph debris and trend at each oil change."],
+   CF:["Inspect debris for bearing (hardened, shiny) vs gear (flake) material; correlate with S·O·S and magnetic plug."]},
+  extreme:["Park the unit – a failed final drive can destroy gears, hub and case.",
+   "Drain the oil and inspect debris immediately.",
+   "If large chips or bearing material are confirmed, plan final drive removal / overhaul and replace the Duo-Cone seal group."],
+  el:{Fe:"planetary gears, bearings",Si:"dirt ingress – Duo-Cone seal leak or breather",Al:"dirt (with Si) or carrier/housing",Cr:"bearings",Ni:"bearings/gears",Cu:"thrust washers/bushings",Na:"water ingress"}},
+ hyd:{sys:"hydraulic oil",
+  head:{SOS:["Inspect hydraulic system: contamination source (rod seals, breather), filters, pump flow & case drain test","STOP – park unit. Hydraulic Extreme: case drain & pump test, plan pump replacement + system flush"],
+        CF:["Hydraulic filter Critical – bronze = pump wear; perform case drain & flow test","STOP – heavy debris in hydraulic filter, park unit; replace pump and flush system"],
+        MP:["Hydraulic magnetic debris Critical – inspect pump/valves","STOP – heavy ferrous debris, park unit"]},
+  concern:"Abnormal hydraulic oil condition – pump wear (piston slippers, port plate), contamination by dirt/water via cylinder rod seals or tank breather, or oil degradation.",
+  checks:{
+   SOS:["Read the S·O·S report: Fe, Cu (pump slippers/port plate), Al, Si (dirt), water and ISO particle count/cleanliness code.",
+    "Resample within 50 SMU at operating temperature.",
+    "Check filter bypass/restriction indicators; change hydraulic filters and inspect the removed elements.",
+    "Inspect the tank breather, filler cap and implement cylinder rod seals/wipers (blade lift, tilt, ripper) for dirt ingress.",
+    "Perform pump flow & pressure test and measure case drain flow (high case drain = internal pump wear).",
+    "Check hydraulic oil temperature, implement cycle times and pump noise/cavitation at the suction line.",
+    "If contamination is the main cause, run kidney-loop filtration to target cleanliness."],
+   CF:["Open the filter: bronze/brass → pump piston slippers/port plate; steel → pump/valve spools; rubber → seals.",
+    "Measure case drain flow and correlate with S·O·S Cu/Fe."],
+   MP:["Inspect magnetic debris; correlate with filter and S·O·S; measure case drain flow."]},
+  extreme:["Park the unit – pump debris will spread to valves and cylinders.",
+   "Measure case drain flow and pump pressure immediately.",
+   "If pump wear is confirmed: replace the pump, flush the system, change all filters and verify ISO cleanliness before release."],
+  el:{Fe:"pump/valve/cylinder steel parts",Cu:"pump piston slippers, port plate (bronze)",Al:"pump housing or dirt (with Si)",Si:"dirt ingress – rod seals, breather, refilling",Na:"water ingress",Sn:"pump bronze parts",Pb:"pump bronze parts"}},
+ track:{sys:"undercarriage",
+  head:{CTS:["Schedule track link replacement – order the track group and plan downtime with sprocket/idler check","REPLACE track link immediately – risk of track separation; reduce operation until replaced"]},
+  concern:"Track link wear beyond the CTS limit – link height (rail) wear and/or pitch extension from internal pin & bushing wear.",
+  checks:{CTS:["Review CTS measurements: link height wear %, track pitch extension (internal pin/bushing wear), bushing external wear.",
+    "Inspect for dry/leaking joints (SALT seal failure), cracked links, loose or broken shoes and bolts.",
+    "Check and adjust track sag/tension; inspect the recoil/adjuster.",
+    "Inspect mating parts – sprocket segments, idlers, track & carrier rollers – and plan them as one system to avoid accelerated wear on new links.",
+    "Order the track group (links, shoes, bolts) and book the downtime window."]},
+  extreme:["Replace immediately – high risk of track separation, link cracking or pin walk-out.",
+   "Reduce operation to essential work only until replaced; inspect sprocket and idlers before fitting the new chain."],el:{}},
+ uc:{sys:"undercarriage",
+  head:{CTS:["Schedule replacement – check tread/flange wear and floating seal leaks","Replace immediately – risk of seal failure/collapse"]},
+  concern:"Undercarriage component wear beyond the CTS limit (tread/flange wear) or seal leakage.",
+  checks:{CTS:["Review CTS tread and flange wear %.","Check floating seals for oil leakage and bearing end play.","Inspect mounting bolts and the matching track link condition; plan replacement as a set."]},
+  extreme:["Replace immediately and inspect the track chain for related damage."],el:{}},
+ other:{sys:"component",
+  head:{SOS:["Inspect component – confirm with resample and debris check","STOP – park unit and inspect component"],MP:["Inspect debris source","STOP – park unit and inspect"],CF:["Inspect filter debris source","STOP – park unit and inspect"],CTS:["Please schedule the replacement","Replace the parts immediately"]},
+  concern:"Abnormal condition result for this component.",
+  checks:{SOS:["Read the full S·O·S report and resample within 50 SMU.","Check for leaks, contamination and abnormal temperature/noise."],MP:["Inspect and photograph the magnetic debris; correlate with oil analysis."],CF:["Cut the filter and identify the debris type."],CTS:["Review the CTS measurement and order replacement parts."]},
+  extreme:["Park the unit and inspect immediately."],el:{}}};
+const COMBO_TXT="SOS, magnetic plug and cutting filter are all B – three independent methods agree on abnormal wear, so the component is escalated to Critical.";
+
+function trendNote(o,label){
+ if(!o)return null;const v=[...o.seq].filter(c=>c in GRADE).map(c=>GRADE[c]);if(v.length<2)return null;
+ const [a,...p]=v,prev=p.slice(0,3);
+ if(a>=2&&prev.every(x=>x<=1))return`${label}: sudden step change versus previous samples – confirm with a resample before a major teardown, but act on the result meanwhile.`;
+ if(a>=2&&prev.length>=2&&prev[0]>=2&&prev[1]>=2)return`${label}: repeated abnormal results – stop resampling and carry out the physical inspection.`;
+ if(prev.length>=2&&a>prev[0]&&prev[0]>=prev[1])return`${label}: deteriorating trend over the last samples – wear is accelerating.`;
+ return null}
+function advise(r){
+ if(r.lv<2)return null;
+ const grp=groupOf(r.comp),kb=KB[grp];
+ const src=[];for(const k of["SOS","MP","CF"]){const o=r[k.toLowerCase()];if(o&&(GRADE[o.latest]>=2||r.combo))src.push([k,GRADE[o.latest]])}
+ if(r.cts&&GRADE[r.cts]>=2)src.push(["CTS",GRADE[r.cts]]);
+ src.sort((a,b)=>b[1]-a[1]);
+ const pick=k=>kb.checks[k]?kb:KB.other;
+ const top=src[0]||["SOS",r.lv];const hk=pick(top[0]).head[top[0]]||KB.other.head[top[0]];
+ const headline=r.combo&&top[1]<2?"Inspect component – SOS, magnetic plug and filter all B (escalated to Critical)":hk[r.lv===3?1:0];
+ const checks=uniq(src.flatMap(([k])=>pick(k).checks[k]||[]));
+ const extreme=r.lv===3?uniq(src.filter(s=>s[1]===3).flatMap(([k])=>pick(k).extreme)):[];
+ const notes=[];
+ if(r.combo)notes.push(COMBO_TXT);
+ const hi=["sos","mp","cf"].filter(k=>r[k]&&GRADE[r[k].latest]>=2);
+ if(hi.includes("sos")&&(hi.includes("mp")||hi.includes("cf")))notes.push("Oil analysis and debris inspection agree – high confidence of active internal wear.");
+ for(const[k,l]of[["sos","S·O·S"],["mp","Magnetic plug"],["cf","Cutting filter"]]){const t=trendNote(r[k],l);if(t)notes.push(t)}
+ if(r.pct>=1)notes.push(`Component is at ${pctTxt(r.pct)} of its ${fh(r.target)} h target life – treat as end-of-life: plan exchange/Reman rather than repair.`);
+ else if(r.pct>0&&r.pct<.5)notes.push(`Only ${pctTxt(r.pct)} of target life used – possible premature failure: capture root cause (contamination, installation, operation) and check warranty.`);
+ const tq=num(r.top);if(tq>0)notes.push(`Oil top-up recorded (${f1(tq)} L) – check for external leaks/consumption; frequent top-ups also dilute wear-metal readings.`);
+ if(r.cstat)notes.push(`Current component status: “${r.cstat}” – follow up parts/workshop readiness.`);
+ const els=[];const found=uniq((r.hist.match(/\b(Fe|Cu|Pb|Al|Si|Cr|Sn|Na|K|Ni|Mo)\b/gi)||[]).map(e=>e[0].toUpperCase()+e.slice(1).toLowerCase()));
+ for(const e of found){const m=kb.el?.[e];if(m)els.push(`${e} → ${m}`)}
+ if(found.includes("Si")&&found.includes("Al"))els.push("Si + Al together → dirt ingress is the most likely root cause; fix the entry point first, then change oil/filters.");
+ const ctsOnly=src.length&&src.every(s=>s[0]==="CTS");
+ const timing=r.lv===3?(ctsOnly?"Immediately – replace the parts now; restrict operation until done":"Immediately – park the unit and inspect within this shift"):(ctsOnly?"Schedule replacement at the next planned downtime / PM":"Within 24–72 h (≤ 50 SMU) – inspect and resample");
+ return{headline,concern:kb.concern,checks,extreme,notes,els,timing,grp}}
 function evaluate(r){
  let lv=-1;const acts=[];
- for(const[k,o]of[["SOS",r.sos],["MP",r.mp],["CF",r.cf]])if(o){const v=GRADE[o.latest];lv=Math.max(lv,v);if(v>0)acts.push({lv:v,t:SRC_TXT[k][v]})}
- if(r.sos?.latest==="B"&&r.mp?.latest==="B"&&r.cf?.latest==="B"){lv=Math.max(lv,2);acts.push({lv:2,t:COMBO_TXT,combo:1})}
- if(r.cts){const v=GRADE[r.cts];lv=Math.max(lv,v);if(v>0)acts.push({lv:v,t:SRC_TXT.CTS[v]})}
- acts.sort((a,b)=>b.lv-a.lv);
- r.lv=lv;r.status=lv<0?"No Data":STATUS[lv];r.acts=acts;r.combo=acts.some(a=>a.combo)}
+ for(const[k,o]of[["SOS",r.sos],["MP",r.mp],["CF",r.cf]])if(o){const v=GRADE[o.latest];lv=Math.max(lv,v);if(v===1)acts.push(CAUTION_TXT[k])}
+ r.combo=r.sos?.latest==="B"&&r.mp?.latest==="B"&&r.cf?.latest==="B";if(r.combo)lv=Math.max(lv,2);
+ if(r.cts){const v=GRADE[r.cts];lv=Math.max(lv,v);if(v===1)acts.push(CAUTION_TXT.CTS)}
+ r.lv=lv;r.status=lv<0?"No Data":STATUS[lv];r.ai=advise(r);
+ r.rec=r.ai?r.ai.headline:acts[0]||(lv===0?"Normal – continue routine monitoring":"")}
 
-/* ============ BUILD DATA ============ */
+/* ================= BUILD ================= */
 function build(rows){
- const hi=rows.findIndex(r=>r.some(c=>nk(c)==="unitno"));if(hi<0)throw Error('Header "Unit No." not found in data');
+ const hi=rows.findIndex(r=>r.some(c=>nk(c)==="unitno"));if(hi<0)throw Error('Header "Unit No." not found');
  const H=rows[hi].map(nk),find=(...n)=>{for(const x of n){const i=H.indexOf(x);if(i>=0)return i}return-1},starts=p=>H.findIndex(h=>h.startsWith(p));
- const C={unit:find("unitno"),type:find("unittype"),dept:find("dept"),model:find("model"),mfg:find("manufacture"),comp:find("component"),hm:find("currenthm"),
-  life:find("componentlifehours"),target:find("targetlifetimehours"),pct:find("componentlifetime"),remH:starts("compliferemaininghour"),remM:starts("compliferemainingmonth"),
-  avg:starts("avgschedule"),cstat:find("statuscomponent"),sos:find("sos"),cf:starts("cuttingfilter"),mp:starts("magneticplug"),top:starts("topupoil"),cts:find("cts"),
-  hist:starts("maintenance"),rating:find("rating"),warr:starts("warranty")};
+ const C={unit:find("unitno"),dept:find("dept"),model:find("model"),comp:find("component"),hm:find("currenthm"),life:find("componentlifehours"),target:find("targetlifetimehours"),pct:find("componentlifetime"),
+  remH:starts("compliferemaininghour"),remM:starts("compliferemainingmonth"),avg:starts("avgschedule"),cstat:find("statuscomponent"),sos:find("sos"),cf:starts("cuttingfilter"),mp:starts("magneticplug"),
+  top:starts("topupoil"),cts:find("cts"),hist:starts("maintenance"),rating:find("rating")};
  if(C.comp<0||C.model<0)throw Error("Columns Component / Model not found");
- const chg=["1st","2nd","3rd","4th","5th"].map(n=>H.indexOf(n)).filter(i=>i>=0);
- const get=(r,i)=>i>=0?txt(r[i]):"";
+ const chg=["1st","2nd","3rd","4th","5th"].map(n=>H.indexOf(n)).filter(i=>i>=0),get=(r,i)=>i>=0?txt(r[i]):"";
  const map=new Map(),order=[];
  for(const r of rows.slice(hi+1)){
   const unit=get(r,C.unit),comp=get(r,C.comp);if(!unit||!comp||nk(unit)==="unitno")continue;
   const life=num(get(r,C.life)),target=num(get(r,C.target));let pct=life/target;
   if(!Number.isFinite(pct)){const p=get(r,C.pct);pct=num(p);if(Number.isFinite(pct)&&/%$/.test(p))pct/=100}
-  const rec={unit,comp,type:get(r,C.type),dept:get(r,C.dept)||"-",model:get(r,C.model)||"UNSPECIFIED",mfg:get(r,C.mfg),hm:num(get(r,C.hm)),
-   life,target,pct,remH:num(get(r,C.remH)),remM:num(get(r,C.remM)),avg:num(get(r,C.avg)),
+  const rec={unit,comp,dept:get(r,C.dept)||"-",model:get(r,C.model)||"UNSPECIFIED",hm:num(get(r,C.hm)),life,target,pct,remH:num(get(r,C.remH)),remM:num(get(r,C.remM)),avg:num(get(r,C.avg)),
    cstat:(v=>v==="-"||v==="0"?"":v)(get(r,C.cstat)),sos:grade(get(r,C.sos)),mp:grade(get(r,C.mp)),cf:grade(get(r,C.cf)),cts:ctsGrade(get(r,C.cts)),ctsRaw:get(r,C.cts),
-   top:get(r,C.top),hist:(v=>v==="-"?"":v)(get(r,C.hist)),rating:get(r,C.rating),warr:get(r,C.warr),
+   top:(v=>v==="-"?"":v)(get(r,C.top)),hist:(v=>v==="-"?"":v)(get(r,C.hist)),rating:get(r,C.rating),
    changes:chg.map(i=>({hm:txt(r[i]),date:txt(r[i+1])})).filter(x=>x.hm&&x.hm!=="-")};
   evaluate(rec);map.set(unit+"|"+comp,rec);if(!order.includes(comp))order.push(comp)}
- RECS=[...map.values()];COMPS=order;
- const um=new Map();for(const r of RECS){const u=um.get(r.unit)||um.set(r.unit,{id:r.unit,model:r.model,dept:r.dept,type:r.type,hm:r.hm,comps:{}}).get(r.unit);u.comps[r.comp]=r;if(!(u.hm>=r.hm))u.hm=Number.isFinite(r.hm)?r.hm:u.hm}
+ RECS=[...map.values()];COMPS=order;if(!RECS.length)throw Error("No component rows found");
+ const um=new Map();for(const r of RECS){const u=um.get(r.unit)||um.set(r.unit,{id:r.unit,model:r.model,dept:r.dept,hm:NaN,comps:{}}).get(r.unit);u.comps[r.comp]=r;if(Number.isFinite(r.hm)&&!(u.hm>=r.hm))u.hm=r.hm}
  UNITS=[...um.values()].sort((a,b)=>natural(a.id,b.id));
- if(!RECS.length)throw Error("No component rows found");
  if(S.model!=="ALL"&&!UNITS.some(u=>u.model===S.model))S.model="ALL";
- const depts=[...new Set(UNITS.map(u=>u.dept))].sort();
- $("dept").innerHTML='<option value="ALL">All departments</option>'+depts.map(d=>`<option${d===S.dept?" selected":""}>${esc(d)}</option>`).join("")}
+ $("dept").innerHTML='<option value="ALL">All departments</option>'+uniq(UNITS.map(u=>u.dept)).sort().map(d=>`<option${d===S.dept?" selected":""}>${esc(d)}</option>`).join("")}
 
-/* ============ LOADING ============ */
-async function loadText(text,from,save){
- build(parseCSV(text));SRC={at:Date.now(),from};if(save){lsSet(CACHE_KEY,text);lsSet(CACHE_AT,String(SRC.at))}render()}
+/* ================= LOAD ================= */
+function loadText(t,save){build(parseCSV(t));SRC={at:Date.now()};if(save){lsSet(CACHE_KEY,t);lsSet(CACHE_AT,String(SRC.at))}render()}
 async function sync(){
- const b=$("sync");b.disabled=true;chip("busy","Data: syncing");
- try{const res=await fetch(CSV_URL+(CSV_URL.includes("?")?"&":"?")+"_="+Date.now(),{cache:"no-store"});
-  if(!res.ok)throw Error("HTTP "+res.status);const t=await res.text();if(/^\s*<!doctype html/i.test(t))throw Error("Sheet is not published as CSV");
-  await loadText(t,"Google Sheets",true);chip("live",`Live · ${UNITS.length} units`);
-  $("meta").textContent=`Synced ${new Date(SRC.at).toLocaleString()} · ${RECS.length} components · source: Google Sheets`}
- catch(e){const c=lsGet(CACHE_KEY);
-  if(c&&!RECS.length){try{await loadText(c,"cache",false);SRC.at=+lsGet(CACHE_AT)||0}catch{}}
-  chip(RECS.length?"cached":"error",RECS.length?"Data: cached":"Data: unavailable");
-  $("meta").textContent=RECS.length?`Google Sheets unavailable (${e.message}) · showing saved data from ${SRC.at?new Date(SRC.at).toLocaleString():"—"}`:`Could not load data: ${e.message}`;
-  toast("Sync failed: "+e.message)}
+ const b=$("sync");b.disabled=true;chip("busy","Syncing…");
+ try{const res=await fetch(CSV_URL+(CSV_URL.includes("?")?"&":"?")+"_="+Date.now(),{cache:"no-store"});if(!res.ok)throw Error("HTTP "+res.status);
+  const t=await res.text();if(/^\s*<!doctype html/i.test(t))throw Error("Sheet is not published as CSV");
+  loadText(t,true);chip("live",`Live · ${UNITS.length} units`);$("meta").textContent=`Synced ${new Date(SRC.at).toLocaleString()} · ${RECS.length} components`}
+ catch(e){const c=lsGet(CACHE_KEY);if(c&&!RECS.length){try{loadText(c,false);SRC.at=+lsGet(CACHE_AT)||0}catch{}}
+  chip(RECS.length?"cached":"error",RECS.length?"Cached data":"Data unavailable");
+  $("meta").textContent=RECS.length?`Google Sheets unavailable (${e.message}). Showing data saved ${SRC.at?new Date(SRC.at).toLocaleString():"earlier"}.`:`Could not load: ${e.message}`;toast("Sync failed: "+e.message)}
  finally{b.disabled=false}}
 async function loadFile(f){
- try{chip("busy","Data: reading file");let t;
+ try{chip("busy","Reading file…");let t;
   if(/\.csv$/i.test(f.name))t=await f.text();
   else{if(!window.XLSX)await new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";s.onload=ok;s.onerror=()=>no(Error("Could not load Excel reader"));document.head.append(s)});
-   const wb=XLSX.read(await f.arrayBuffer());const name=wb.SheetNames.find(n=>/comp/i.test(n))||wb.SheetNames[0];t=XLSX.utils.sheet_to_csv(wb.Sheets[name])}
-  await loadText(t,f.name,false);chip("cached",`File · ${UNITS.length} units`);$("meta").textContent=`Loaded from file “${f.name}” · ${RECS.length} components (press Sync to return to Google Sheets)`}
- catch(e){toast("File error: "+e.message);chip("error","Data: file error")}}
+   const wb=XLSX.read(await f.arrayBuffer());const n=wb.SheetNames.find(n=>/comp/i.test(n))||wb.SheetNames[0];t=XLSX.utils.sheet_to_csv(wb.Sheets[n])}
+  loadText(t,false);chip("cached",`File · ${UNITS.length} units`);$("meta").textContent=`Loaded “${f.name}”. Press Sync to return to Google Sheets.`}
+ catch(e){toast("File error: "+e.message);chip("error","File error")}}
 
-/* ============ VIEW HELPERS ============ */
+/* ================= VIEW ================= */
 const scope=()=>UNITS.filter(u=>(S.model==="ALL"||u.model===S.model)&&(S.dept==="ALL"||u.dept===S.dept));
-const recsOf=units=>units.flatMap(u=>Object.values(u.comps));
+const recsOf=us=>us.flatMap(u=>Object.values(u.comps));
+const counts=rs=>{const s={Normal:0,Caution:0,Critical:0,Extreme:0,"No Data":0};for(const r of rs)s[r.status]++;return s};
 const worst=u=>Math.max(-1,...Object.values(u.comps).map(c=>c.lv));
 const maxLife=u=>Math.max(0,...Object.values(u.comps).map(c=>Number.isFinite(c.pct)?c.pct:0));
-function visible(){
- const q=S.q.toLowerCase();
- let a=scope().filter(u=>(S.st==="ALL"||Object.values(u.comps).some(c=>c.status===S.st))&&(!q||[u.id,u.model,u.dept,...Object.values(u.comps).flatMap(c=>[c.comp,c.hist,c.cstat])].some(v=>txt(v).toLowerCase().includes(q))));
+function visible(){const q=S.q.toLowerCase();
+ let a=scope().filter(u=>(S.st==="ALL"||Object.values(u.comps).some(c=>c.status===S.st))&&(!q||[u.id,u.model,u.dept,...Object.values(u.comps).flatMap(c=>[c.comp,c.hist,c.cstat,c.rec])].some(v=>txt(v).toLowerCase().includes(q))));
  if(S.sort==="risk")a.sort((x,y)=>worst(y)-worst(x)||recsOf([y]).filter(c=>c.lv>=2).length-recsOf([x]).filter(c=>c.lv>=2).length||natural(x.id,y.id));
- if(S.sort==="life")a.sort((x,y)=>maxLife(y)-maxLife(x)||natural(x.id,y.id));
- return a}
-function compCols(units){const set=new Set();for(const u of units)for(const c of Object.values(u.comps))if(!S.cmonly||c.status!=="No Data")set.add(c.comp);return COMPS.filter(c=>set.has(c))}
-const counts=recs=>{const s={Normal:0,Caution:0,Critical:0,Extreme:0,"No Data":0};for(const r of recs)s[r.status]++;return s};
-const cntBadges=s=>["Extreme","Critical","Caution"].filter(k=>s[k]).map(k=>`<i style="background:${COL[k]}${k==="Caution"?";color:#422006":""}" title="${k}">${s[k]} ${LETTER[k]}</i>`).join("");
+ if(S.sort==="life")a.sort((x,y)=>maxLife(y)-maxLife(x)||natural(x.id,y.id));return a}
+const cols=us=>{const s=new Set();for(const u of us)for(const c of Object.values(u.comps))if(!S.cmonly||c.status!=="No Data")s.add(c.comp);return COMPS.filter(c=>s.has(c))};
+const stackHtml=(s,tot)=>["Normal","Caution","Critical","Extreme"].map(k=>s[k]?`<i style="width:${s[k]/tot*100}%;background:${COL[k]}" title="${k}: ${s[k]}"></i>`:"").join("");
 
-/* ============ TILE ============ */
-function trendHtml(o){return o?`<span class="tr"><small>trend</small>${[...o.trend].map(l=>g(l)).join("")}</span>`:""}
 function tile(r){
- if(!r)return`<div class="tile ph sub">—</div>`;
- const dim=S.st!=="ALL"&&r.status!==S.st,over=r.pct>=1,top=r.acts[0];
- const rows=[["SOS",r.sos],["MP",r.mp],["CF",r.cf]].filter(x=>x[1]).map(([k,o])=>`<span>${k}</span>${g(o.latest)}${trendHtml(o)}`).join("")+(r.cts?`<span>CTS</span>${g(r.cts)}<span style="font-size:9.5px">${r.cts==="A"?"Normal":["","Order parts","Schedule replacement","Replace immediately"][GRADE[r.cts]]}</span>`:"");
- return`<button class="tile${dim?" dim":""}" data-s="${r.status}" data-cell="${esc(r.unit)}|${esc(r.comp)}" title="${esc(r.acts.map(a=>a.t).join("\n")||r.status)}">
-  <div class="th"><b>${r.status}</b>${r.status!=="No Data"?g(LETTER[r.status]):""}</div>
-  <div class="life"><div class="l1"><span class="mono">${fh(r.life)} / ${fh(r.target)} h</span><b class="mono${over?" over":""}">${pctTxt(r.pct)}</b></div>
-   <div class="lb"><i style="width:${Math.min(100,Math.max(0,(r.pct||0)*100))}%;background:${lifeCol(r.pct)}"></i></div>
-   <div class="l1" style="opacity:.85;white-space:nowrap"><span>Rem.</span><span class="mono${over?" over":""}">${fh(r.remH)} h${Number.isFinite(r.remM)?" · "+f1(r.remM)+" mo":""}</span></div></div>
-  ${rows?`<div class="cm">${rows}</div>`:""}
-  ${top?`<div class="act">⚠ ${esc(top.t)}</div>`:""}
-  ${r.hist||r.cstat?`<div class="tf">${r.cstat?`<span class="pill y">${esc(r.cstat)}</span>`:""}${r.hist?`<span class="pill" title="${esc(r.hist)}">${esc(r.hist)}</span>`:""}</div>`:""}
- </button>`}
+ if(!r)return`<div class="ph0">—</div>`;
+ const over=r.pct>=1,res=[["SOS",r.sos],["MP",r.mp],["CF",r.cf]].filter(x=>x[1]);
+ return`<button class="tile${S.st!=="ALL"&&r.status!==S.st?" dim":""}" data-s="${r.status}" data-cell="${esc(r.unit)}|${esc(r.comp)}">
+  <div class="th"><b>${r.status==="No Data"?"No CM data":r.status}</b>${r.status!=="No Data"?`<span class="gr">${LET[r.status]}</span>`:""}</div>
+  <div class="tb2">
+   <div class="lf"><span class="mono" style="font-size:10.5px">${fh(r.life)} / ${fh(r.target)} h</span><span class="pc${over?" ovr":""}">${pctTxt(r.pct)}</span>
+    <span class="bar"><i style="width:${Math.min(100,Math.max(0,(r.pct||0)*100))}%;background:${lifeCol(r.pct)}"></i><u></u></span>
+    <small class="${over?"ovr":""}">Remaining ${fh(r.remH)} h${Number.isFinite(r.remM)?" · "+f1(r.remM)+" mo":""}</small></div>
+   ${res.length||r.cts?`<div class="rs">${res.map(([k,o])=>`<div class="rr"><span>${k}</span>${gr(o.latest)}<span class="tr">trend ${[...o.trend].map(l=>gr(l,"s")).join("")}</span></div>`).join("")}${r.cts?`<div class="rr"><span>CTS</span>${gr(r.cts)}<span class="tr">${["Normal","Order parts","Schedule replacement","Replace now"][GRADE[r.cts]]}</span></div>`:""}</div>`:""}
+   ${r.lv>=1?`<div class="rec">${r.lv>=2?"🔧 ":""}${esc(r.rec)}</div>`:""}
+   ${r.cstat||r.hist?`<div class="tags">${r.cstat?`<span class="tag w">${esc(r.cstat)}</span>`:""}${r.hist?`<span class="tag" title="${esc(r.hist)}">${esc(r.hist)}</span>`:""}</div>`:""}
+  </div></button>`}
 
-/* ============ RENDER ============ */
 function render(){
- const units=scope(),recs=recsOf(units),s=counts(recs),mon=recs.length-s["No Data"],vis=visible();
- const uc=k=>new Set(recs.filter(r=>r.status===k).map(r=>r.unit)).size,over=recs.filter(r=>r.pct>=1);
- $("k-units").textContent=units.length;$("k-units-n").textContent=`${recs.length} components · ${mon} monitored`;
- for(const[k,id]of[["Extreme","ext"],["Critical","cri"],["Caution","cau"],["Normal","ok"]]){$("k-"+id).textContent=s[k];$("k-"+id+"-n").textContent=k==="Normal"?`${mon?Math.round(s.Normal/mon*100):0}% of monitored`:`${uc(k)} unit${uc(k)===1?"":"s"} affected`}
- $("k-over").textContent=over.length;$("k-over-n").textContent=`${new Set(over.map(r=>r.unit)).size} units · life ≥ 100%`;
- // models
- const models=[...new Set(UNITS.map(u=>u.model))].sort();
- $("models").innerHTML=`<button class="model${S.model==="ALL"?" on":""}" data-m="ALL"><em>🏗</em><span>All Fleet<small>${UNITS.length} units</small></span></button>`+
-  models.map(m=>{const us=UNITS.filter(u=>u.model===m),c=counts(recsOf(us));return`<button class="model${S.model===m?" on":""}" data-m="${esc(m)}"><em>🚜</em><span>${esc(m)}<small>${us.length} units · ${c.Extreme} X · ${c.Critical} C · ${c.Caution} B</small></span></button>`}).join("");
+ const us=scope(),rs=recsOf(us),s=counts(rs),mon=rs.length-s["No Data"],vis=visible(),over=rs.filter(r=>r.pct>=1);
+ const affected=k=>new Set(rs.filter(r=>r.status===k).map(r=>r.unit)).size;
+ $("title").textContent=S.model==="ALL"?"All Fleet":S.model;$("crumb").textContent=`Fleet overview${S.dept!=="ALL"?" · "+S.dept:""}${S.st!=="ALL"?" · "+S.st:""}`;
+ // sidebar nav
+ const models=uniq(UNITS.map(u=>u.model)).sort();
+ $("nav").innerHTML=[["ALL","All Fleet",UNITS],...models.map(m=>[m,m,UNITS.filter(u=>u.model===m)])].map(([k,l,ul])=>{const c=counts(recsOf(ul)),t=STATUS.reduce((a,x)=>a+c[x],0)||1;
+  return`<button class="${S.model===k?"on":""}" data-m="${esc(k)}"><b>${esc(l)}</b><span>${ul.length} units</span><span class="mini">${stackHtml(c,t)}</span><span style="grid-column:1/-1">${c.Extreme} X · ${c.Critical} C · ${c.Caution} B</span></button>`}).join("");
+ $("stchips").innerHTML=[["ALL","All"],...ALLST.map(k=>[k,k])].map(([k,l])=>`<button class="${S.st===k?"on":""}" data-st="${esc(k)}">${k!=="ALL"?gr(LET[k],"s"):""}${l}</button>`).join("");
+ // strip
+ const tot=mon||1;
+ $("strip").innerHTML=`<div style="--c:var(--acc)"><small>Units</small><b>${us.length}</b><span>${rs.length} components · ${mon} monitored</span></div>
+  ${[["Extreme","#7f1d1d"],["Critical","#ef4444"],["Caution","#eab308"],["Normal","#16a34a"]].map(([k,c])=>`<div style="--c:${c}"><small>${k} (${LET[k]})</small><b style="color:${k==="Caution"?"#ca8a04":k==="Extreme"?"var(--xt)":c}">${s[k]}</b><span>${k==="Normal"?Math.round(s.Normal/tot*100)+"% of monitored":affected(k)+" unit"+(affected(k)===1?"":"s")+" affected"}</span></div>`).join("")}
+  <div style="--c:#7c3aed"><small>Over target life</small><b style="color:#7c3aed">${over.length}</b><span>${new Set(over.map(r=>r.unit)).size} units · life ≥ 100%</span></div>
+  <div class="stack">${stackHtml(s,tot)}</div>`;
  // donut
- $("chart-lbl").textContent=S.model==="ALL"?"All fleet":S.model;
- $("pct").textContent=mon?Math.round(s.Normal/mon*100)+"%":"–";
- const R=80,L=2*Math.PI*R;let off=0;
- $("pie").innerHTML=`<circle cx="100" cy="100" r="${R}" fill="none" stroke="rgba(127,140,160,.18)" stroke-width="20"/>`+(mon?STATUS.map(k=>{const v=s[k]/mon*L;const h=v?`<circle cx="100" cy="100" r="${R}" fill="none" stroke="${COL[k]}" stroke-width="20" stroke-dasharray="${v} ${L-v}" stroke-dashoffset="${-off}" data-st="${k}"><title>${k}: ${s[k]}</title></circle>`:"";off+=v;return h}).join(""):"");
- $("legend").innerHTML=[...STATUS].reverse().map(k=>`<button data-st="${k}" class="${S.st===k?"on":""}"><span class="lt"><i style="background:${COL[k]}${k==="Caution"?";color:#422006":""}">${LETTER[k]}</i>${k}</span><b class="mono">${s[k]} · ${mon?(s[k]/mon*100).toFixed(1):0}%</b></button>`).join("");
- $("nd-note").innerHTML=s["No Data"]?`<button data-st="No Data" class="sub" style="text-decoration:underline">${s["No Data"]} components have no SOS / MP / CF / CTS result</button> (not counted in chart)`:"";
- // priority list
- const pr=recs.filter(r=>r.lv>=2).sort((a,b)=>b.lv-a.lv||(b.pct||0)-(a.pct||0)||natural(a.unit,b.unit));
- $("p-n").textContent=pr.length?pr.length+" items":"";
- $("plist").innerHTML=pr.length?pr.map(r=>`<button class="pi" style="--c:${COL[r.status]}" data-cell="${esc(r.unit)}|${esc(r.comp)}"><b>${esc(r.unit)}</b><span><b>${esc(r.comp)}</b> <span class="sub">· ${r.status} · life ${pctTxt(r.pct)}</span></span><span class="why">${esc(r.acts[0]?.t||"")}</span></button>`).join(""):'<div class="sub">No Extreme or Critical components 🎉</div>';
- // hotspots
- const hm=new Map();for(const r of recs)if(r.lv>=1){const e=hm.get(r.comp)||hm.set(r.comp,{Extreme:0,Critical:0,Caution:0}).get(r.comp);e[r.status]++}
- const hot=[...hm].sort((a,b)=>b[1].Extreme-a[1].Extreme||b[1].Critical-a[1].Critical||b[1].Caution-a[1].Caution);
- $("hot").innerHTML=hot.length?hot.map(([n,v])=>`<button data-comp="${esc(n)}"><span>${esc(n)}</span><span class="cnt">${cntBadges(v)}</span></button>`).join(""):'<div class="sub">No abnormal components.</div>';
- $("reset-st").hidden=S.st==="ALL";$("st").value=S.st;
- renderTable(vis);
- $("count").textContent=`${vis.length} of ${units.length} units shown`}
-function renderTable(vis){
- const cols=compCols(vis.length?vis:scope());
- $("head").innerHTML=`<tr><th class="ca">Unit</th>${cols.map(c=>`<th data-c="${esc(c)}">${esc(c)}</th>`).join("")}</tr>`;
- $("body").innerHTML=vis.length?vis.map(u=>{const c=counts(Object.values(u.comps));
-  return`<tr><td class="ca"><button class="uid" data-unit="${esc(u.id)}">${esc(u.id)} ↗</button><div class="ui sub">${esc(u.model)} · ${esc(u.dept)}<br>HM ${fh(u.hm)} h</div><div class="ucnt cnt">${cntBadges(c)||'<i style="background:#16a34a">OK</i>'}</div></td>${cols.map(k=>`<td class="cc">${tile(u.comps[k])}</td>`).join("")}</tr>`}).join("")
-  :`<tr><td colspan="${cols.length+1}" class="sub" style="text-align:center;padding:30px">No matching units.</td></tr>`}
+ $("pie-lbl").textContent=`${mon} monitored`;$("pct").textContent=mon?Math.round(s.Normal/mon*100)+"%":"–";
+ const R=78,L=2*Math.PI*R;let off=0;
+ $("pie").innerHTML=`<circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--soft)" stroke-width="30"/>`+(mon?STATUS.map(k=>{const v=s[k]/mon*L,gap=s[k]&&s[k]<mon?1.5:0;const h=v?`<circle cx="100" cy="100" r="${R}" fill="none" stroke="${COL[k]}" stroke-width="30" stroke-dasharray="${Math.max(0,v-gap)} ${L-v+gap}" stroke-dashoffset="${-off}" data-st="${k}"><title>${k}: ${s[k]}</title></circle>`:"";off+=v;return h}).join(""):"");
+ $("legend").innerHTML=["Extreme","Critical","Caution","Normal"].map(k=>`<button class="${S.st===k?"on":""}" data-st="${k}">${gr(LET[k])}<span>${k}<small>${mon?(s[k]/mon*100).toFixed(1):0}%</small></span><b>${s[k]}</b></button>`).join("");
+ $("ndn").innerHTML=s["No Data"]?`${s["No Data"]} components without SOS/MP/CF/CTS result are not counted.`:"";
+ // component bars
+ const cm=new Map();for(const r of rs){if(r.status==="No Data")continue;const e=cm.get(r.comp)||cm.set(r.comp,counts([])).get(r.comp);e[r.status]++}
+ const cl=[...cm].sort((a,b)=>(b[1].Extreme*1e6+b[1].Critical*1e3+b[1].Caution)-(a[1].Extreme*1e6+a[1].Critical*1e3+a[1].Caution));
+ $("cbars").innerHTML=cl.length?cl.map(([n,c])=>{const t=STATUS.reduce((a,k)=>a+c[k],0);return`<button class="cb" data-comp="${esc(n)}" title="${STATUS.map(k=>k+": "+c[k]).join(" · ")}"><span>${esc(n)}</span><span class="bt">${stackHtml(c,t)}</span><em>${t}</em></button>`}).join(""):'<div class="empty">No monitored components.</div>';
+ // worklist
+ const wl=rs.filter(r=>r.lv>=2).sort((a,b)=>b.lv-a.lv||(b.pct||0)-(a.pct||0)||natural(a.unit,b.unit));
+ $("wl-n").textContent=wl.length?`${wl.length} items`:"";
+ $("wl").innerHTML=wl.length?wl.map(r=>`<button class="wi" data-cell="${esc(r.unit)}|${esc(r.comp)}">${gr(LET[r.status])}<b>${esc(r.comp)}</b><span class="u">${esc(r.unit)} · ${pctTxt(r.pct)}</span><p>${esc(r.rec)}</p></button>`).join(""):'<div class="empty">No Critical or Extreme components 🎉</div>';
+ // table
+ const cs=cols(vis.length?vis:us);
+ $("head").innerHTML=`<tr><th class="uc">Unit</th>${cs.map(c=>`<th data-c="${esc(c)}">${esc(c)}</th>`).join("")}</tr>`;
+ $("body").innerHTML=vis.length?vis.map(u=>`<tr><td class="uc"><button class="un" data-unit="${esc(u.id)}">${esc(u.id)}</button><div class="um">${esc(u.model)} · ${esc(u.dept)}<br><span class="mono">HM ${fh(u.hm)} h</span></div><div class="hs">${COMPS.filter(k=>u.comps[k]&&u.comps[k].status!=="No Data").map(k=>`<i style="background:${COL[u.comps[k].status]}" title="${esc(k)}: ${u.comps[k].status}"></i>`).join("")}</div></td>${cs.map(k=>`<td class="cc">${tile(u.comps[k])}</td>`).join("")}</tr>`).join("")
+  :`<tr><td colspan="${cs.length+1}" class="empty">No matching units.</td></tr>`;
+ $("count").textContent=`${vis.length} of ${us.length} units shown · ${cs.length} component columns`}
 function focusComp(n){const th=[...document.querySelectorAll("th[data-c]")].find(t=>t.dataset.c===n);if(th){th.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});th.classList.add("hl");setTimeout(()=>th.classList.remove("hl"),2400)}}
 
-/* ============ MODALS ============ */
-const show=id=>{$(id).hidden=false;document.body.style.overflow="hidden"};
-const hide=id=>{$(id).hidden=true;if([..."m-comp m-unit m-rules".split(" ")].every(m=>$(m).hidden))document.body.style.overflow=""};
-function seqHtml(o,label){if(!o)return`<tr><td><b>${label}</b></td><td class="sub" colspan="2">No result</td></tr>`;
- return`<tr><td><b>${label}</b></td><td>${g(o.latest)} <span class="sub">${["Normal","Caution","Critical","Extreme"][GRADE[o.latest]]}</span></td><td><div class="seq">${[...o.seq].map((l,i)=>g(l,i<3?' style="outline:2px solid var(--a1);outline-offset:1px"':"")).join("")}</div></td></tr>`}
+/* ================= DRAWER ================= */
+function openDrawer(head,body,wide,exp){$("d-head").innerHTML=head;$("d-body").innerHTML=body;$("d-body").scrollTop=0;$("drawer").classList.toggle("wide",!!wide);$("d-exp").hidden=!exp;
+ $("drawer").classList.add("on");$("scrim").classList.add("on");$("drawer").setAttribute("aria-hidden","false")}
+function closeDrawer(){$("drawer").classList.remove("on");$("scrim").classList.remove("on");$("drawer").setAttribute("aria-hidden","true")}
+const seqRow=(o,l)=>`<tr><td><b>${l}</b></td><td>${o?gr(o.latest)+" "+STATUS[GRADE[o.latest]]:'<span class="sub">No result</span>'}</td><td>${o?`<div class="seq">${[...o.seq].map((c,i)=>gr(c,i<3?"s t":"s")).join("")}</div>`:""}</td></tr>`;
+function aiHtml(r){
+ const a=r.ai,key=`kdc2_chk_${r.unit}|${r.comp}`;let done={};try{done=JSON.parse(lsGet(key)||"{}")}catch{}
+ const item=(t,i,ex)=>`<label class="${ex?"ex":""}"><input type="checkbox" data-chk="${esc(key)}" data-i="${i}"${done[i]?" checked":""}><span>${esc(t)}</span></label>`;
+ return`<div class="ai"><div class="aih"><b>🔧 ${esc(a.headline)}</b><span class="badge">AI analyst</span></div><div class="aib">
+  <div class="timing" style="--c:${COL[r.status]}">⏱ ${esc(a.timing)}</div>
+  <div><h4>Likely concern</h4><p style="line-height:1.5">${esc(a.concern)}</p></div>
+  ${a.extreme.length?`<div><h4>Immediate actions (Extreme)</h4><div class="chk">${a.extreme.map((t,i)=>item(t,"x"+i,1)).join("")}</div></div>`:""}
+  <div><h4>Inspection checklist</h4><div class="chk">${a.checks.map((t,i)=>item(t,i)).join("")}</div></div>
+  ${a.els.length?`<div><h4>Wear element interpretation (from remark)</h4><ul>${a.els.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`:""}
+  ${a.notes.length?`<div><h4>Analyst notes</h4><ul>${a.notes.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`:""}
+ </div><div class="disc">AI-generated guidance based on general Caterpillar condition-monitoring and reliability practice. Always confirm with the S·O·S lab comments, Cat SIS service procedures/specifications and your Cat dealer before major decisions. Checklist ticks are saved on this device only.</div></div>`}
 function openComp(unit,comp){
  const u=UNITS.find(x=>x.id===unit),r=u?.comps[comp];if(!r)return;
- $("c-title").innerHTML=`${esc(r.unit)} · ${esc(r.comp)} <span class="g" data-g="${LETTER[r.status]==="–"?"_":LETTER[r.status]}" style="margin-left:6px">${LETTER[r.status]}</span> <span style="color:${r.status==="Extreme"?"#f87171":COL[r.status]};font-size:13px">${r.status}</span>`;
- $("c-body").innerHTML=`<div class="info"><div><small>Model</small><b>${esc(r.model)}</b></div><div><small>Department</small><b>${esc(r.dept)}</b></div><div><small>Current HM</small><b class="mono">${fh(r.hm)} h</b></div>
-  <div><small>Component life</small><b class="mono">${fh(r.life)} h</b></div><div><small>Target life</small><b class="mono">${fh(r.target)} h</b></div><div><small>Life used</small><b class="mono" style="color:${lifeCol(r.pct)}">${pctTxt(r.pct)}</b></div>
-  <div><small>Remaining</small><b class="mono">${fh(r.remH)} h · ${f1(r.remM)} mo</b></div><div><small>Avg schedule</small><b class="mono">${f1(r.avg)} h/day</b></div>${r.cstat?`<div><small>Component status</small><b>${esc(r.cstat)}</b></div>`:""}${r.top&&r.top!=="-"?`<div><small>Top up oil</small><b>${esc(r.top)} L</b></div>`:""}${r.rating?`<div><small>Rating</small><b>${esc(r.rating)}</b></div>`:""}</div>
-  <div class="sec"><h3>Recommended actions</h3>${r.acts.length?r.acts.map(a=>`<div class="box" style="--c:${COL[STATUS[a.lv]]}">${esc(a.t)}</div>`).join(""):`<div class="sub">${r.status==="Normal"?"No action required – continue routine monitoring.":"No condition monitoring result for this component."}</div>`}</div>
-  <div class="sec"><h3>Condition results <span class="sub" style="text-transform:none;letter-spacing:0;font-weight:500">(latest on the left · outlined = trend)</span></h3><table class="htable"><tbody>${seqHtml(r.sos,"SOS")}${seqHtml(r.mp,"Magnetic Plug")}${seqHtml(r.cf,"Cutting Filter")}
-   <tr><td><b>CTS</b></td><td colspan="2">${r.cts?g(r.cts)+" "+["Normal","Caution – please order the parts","Critical – please schedule the replacement","Extreme – replace the parts immediately"][GRADE[r.cts]]:`<span class="sub">${esc(r.ctsRaw||"No result")}</span>`}</td></tr></tbody></table></div>
-  ${r.hist?`<div class="sec"><h3>Maintenance history note</h3><div class="box" style="--c:var(--a1)">${esc(r.hist)}</div></div>`:""}
-  <div class="sec"><h3>Component change history</h3>${r.changes.length?`<table class="htable"><thead><tr><th>#</th><th>Installed at HM</th><th>Date</th></tr></thead><tbody>${r.changes.map((c,i)=>`<tr><td>${i+1}</td><td class="mono">${fh(num(c.hm))} h</td><td>${esc(c.date||"-")}</td></tr>`).join("")}</tbody></table>`:'<div class="sub">No change history.</div>'}</div>`;
- show("m-comp")}
+ const t=r.status==="Caution"?"#3b2a00":"#fff",c=r.status==="No Data"?"#64748b":COL[r.status];
+ const body=`<div class="hero" style="--c:${c};--t:${t}"><span class="gr">${LET[r.status]==="_"?"–":LET[r.status]}</span><div><b>${r.status==="No Data"?"No condition data":r.status}</b><p>${esc(r.rec||"No SOS / magnetic plug / cutting filter / CTS result recorded for this component.")}</p></div></div>
+  <div class="kv"><div><small>Model</small><b>${esc(r.model)}</b></div><div><small>Department</small><b>${esc(r.dept)}</b></div><div><small>Current HM</small><b class="mono">${fh(r.hm)}</b></div><div><small>Comp. life</small><b class="mono">${fh(r.life)} h</b></div><div><small>Target life</small><b class="mono">${fh(r.target)} h</b></div><div><small>Life used</small><b class="mono" style="color:${lifeCol(r.pct)}">${pctTxt(r.pct)}</b></div><div><small>Remaining</small><b class="mono">${fh(r.remH)} h · ${f1(r.remM)} mo</b></div><div><small>Avg schedule</small><b class="mono">${f1(r.avg)} h/day</b></div>${r.cstat?`<div><small>Comp. status</small><b>${esc(r.cstat)}</b></div>`:""}${r.top?`<div><small>Top-up oil</small><b>${esc(r.top)} L</b></div>`:""}</div>
+  ${r.ai?`<div class="sec"><h3>Recommendation</h3>${aiHtml(r)}</div>`:r.lv>=0?`<div class="sec"><h3>Recommendation</h3><p>${esc(r.rec)}</p></div>`:""}
+  <div class="sec"><h3>Condition results <span class="sub" style="font-family:var(--f);letter-spacing:0;text-transform:none;font-size:11.5px">latest on the left · outlined = trend</span></h3><table class="ht"><tbody>${seqRow(r.sos,"S·O·S")}${seqRow(r.mp,"Magnetic plug")}${seqRow(r.cf,"Cutting filter")}<tr><td><b>CTS</b></td><td colspan="2">${r.cts?gr(r.cts)+" "+["Normal","Caution – please order the parts","Critical – please schedule the replacement","Extreme – replace the parts immediately"][GRADE[r.cts]]:`<span class="sub">${esc(r.ctsRaw||"No result")}</span>`}</td></tr></tbody></table></div>
+  ${r.hist?`<div class="sec"><h3>Maintenance remark</h3><p>${esc(r.hist)}</p></div>`:""}
+  <div class="sec"><h3>Component change history</h3>${r.changes.length?`<table class="ht"><thead><tr><th>#</th><th>Installed at HM</th><th>Date</th></tr></thead><tbody>${r.changes.map((c,i)=>`<tr><td>${i+1}</td><td class="mono">${fh(num(c.hm))}</td><td>${esc(c.date||"-")}</td></tr>`).join("")}</tbody></table>`:'<p class="sub">No change history.</p>'}</div>`;
+ openDrawer(`<div class="k">${esc(r.unit)} · ${esc(r.model)}</div><h2>${esc(r.comp)}</h2>`,body)}
 function openUnit(id){
- const u=UNITS.find(x=>x.id===id);if(!u)return;CUR_UNIT=u;const c=counts(Object.values(u.comps));
- $("u-title").innerHTML=`${esc(u.id)} <span class="sub" style="font-size:12px;font-weight:500">· ${esc(u.model)} · ${esc(u.dept)} · HM ${fh(u.hm)} h</span>`;
- $("u-body").innerHTML=`<div class="info">${ALLST.map(k=>`<div><small>${k}</small><b style="color:${k==="Extreme"?"#f87171":COL[k]}">${c[k]}</b></div>`).join("")}</div>
-  <div class="ugrid">${COMPS.filter(k=>u.comps[k]).sort((a,b)=>u.comps[b].lv-u.comps[a].lv).map(k=>`<div><strong>${esc(k)}</strong>${tile(u.comps[k])}</div>`).join("")}</div>`;
- show("m-unit")}
+ const u=UNITS.find(x=>x.id===id);if(!u)return;CUR=u;const c=counts(Object.values(u.comps));
+ const body=`<div class="kv">${ALLST.map(k=>`<div><small>${k}</small><b style="color:${k==="Caution"?"#ca8a04":COL[k]}">${c[k]}</b></div>`).join("")}</div>
+  <div class="ug">${COMPS.filter(k=>u.comps[k]).sort((a,b)=>u.comps[b].lv-u.comps[a].lv).map(k=>`<div><h5>${esc(k)}</h5>${tile(u.comps[k])}</div>`).join("")}</div>`;
+ openDrawer(`<div class="k">${esc(u.model)} · ${esc(u.dept)} · HM ${fh(u.hm)} h</div><h2>${esc(u.id)}</h2>`,body,true,true)}
+function openRules(){openDrawer(`<div class="k">How status is calculated</div><h2>Health rules</h2>`,`<div class="rules">
+ <p><b>Reading results:</b> from the <b>left</b>. Example <span class="mono">XBBACC</span> → latest <b>X</b>, trend <b>X B B</b>. “_” = no sample.</p><br>
+ <p><b>S·O·S, Magnetic Plug, Cutting Filter (latest result)</b></p><ul><li>${gr("X","s")} Extreme – dark red</li><li>${gr("C","s")} Critical – red</li><li>${gr("B","s")} Caution – yellow</li><li>${gr("A","s")} Normal – green</li></ul>
+ <p><b>Combined rule:</b> latest SOS = B <b>and</b> Magnetic Plug = B <b>and</b> Cutting Filter = B → <b>Critical</b>.</p><br>
+ <p><b>CTS:</b> A Normal · B Caution (please order the parts) · C Critical (please schedule the replacement) · X Extreme (replace the parts immediately).</p><br>
+ <p><b>Component status</b> = worst of all results above. Components without any result = <b>No CM data</b> and are excluded from the pie chart. Life % is informational and does not change health status.</p><br>
+ <p><b>Recommendations</b> for Critical and Extreme are generated by built-in AI analyst rules per component group (engine, transmission/torque converter, final drive, hydraulic, track link, undercarriage), including trend analysis, life-based notes and wear-element interpretation from the remark column.</p></div>`)}
 
-/* ============ EXPORT ============ */
-function exportCSV(recs,name){
- if(!recs.length)return toast("Nothing to export.");
+/* ================= EXPORT ================= */
+function exportCSV(rs,name){
+ if(!rs.length)return toast("Nothing to export.");
  const cell=v=>{let s=txt(v);if(/^[=+\-@]/.test(s)&&!/^-?\d/.test(s))s="'"+s;return'"'+s.replace(/"/g,'""')+'"'};
- const head=["Unit No.","Model","Dept","Component","Health","Current HM","Comp life (h)","Target (h)","Life %","Remaining (h)","Remaining (month)","SOS latest","SOS trend","MP latest","MP trend","CF latest","CF trend","CTS","Recommended action","Component status","Maintenance note"];
- const rows=recs.map(r=>[r.unit,r.model,r.dept,r.comp,r.status,fh(r.hm),fh(r.life),fh(r.target),pctTxt(r.pct),fh(r.remH),f1(r.remM),r.sos?.latest||"",r.sos?.trend||"",r.mp?.latest||"",r.mp?.trend||"",r.cf?.latest||"",r.cf?.trend||"",r.cts||"",r.acts.map(a=>a.t).join(" | "),r.cstat,r.hist]);
+ const head=["Unit No.","Model","Dept","Component","Health","Current HM","Comp life (h)","Target (h)","Life %","Remaining (h)","SOS latest","SOS trend","MP latest","MP trend","CF latest","CF trend","CTS","Recommendation","Timing","Inspection checklist","Component status","Remark"];
+ const rows=rs.map(r=>[r.unit,r.model,r.dept,r.comp,r.status,fh(r.hm),fh(r.life),fh(r.target),pctTxt(r.pct),fh(r.remH),r.sos?.latest||"",r.sos?.trend||"",r.mp?.latest||"",r.mp?.trend||"",r.cf?.latest||"",r.cf?.trend||"",r.cts||"",r.rec,r.ai?.timing||"",r.ai?[...r.ai.extreme,...r.ai.checks].map((t,i)=>(i+1)+". "+t).join(" "):"",r.cstat,r.hist]);
  const blob=new Blob(["﻿"+[head,...rows].map(r=>r.map(cell).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"});
  const a=Object.assign(document.createElement("a"),{href:URL.createObjectURL(blob),download:name});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
 
-/* ============ INIT ============ */
+/* ================= INIT ================= */
 function init(){
- const th=lsGet("kdc_theme")||"dark";document.documentElement.dataset.theme=th;$("theme").value=th;
- $("theme").onchange=e=>{document.documentElement.dataset.theme=e.target.value;lsSet("kdc_theme",e.target.value)};
+ const th=lsGet("kdc2_theme")||"light";document.documentElement.dataset.theme=th;$("dark").checked=th==="dark";
+ $("dark").onchange=e=>{const t=e.target.checked?"dark":"light";document.documentElement.dataset.theme=t;lsSet("kdc2_theme",t)};
  let tm;$("q").oninput=e=>{S.q=e.target.value.trim();clearTimeout(tm);tm=setTimeout(render,150)};
- $("st").onchange=e=>{S.st=e.target.value;render()};$("dept").onchange=e=>{S.dept=e.target.value;render()};
- $("sort").onchange=e=>{S.sort=e.target.value;render()};$("cmonly").onchange=e=>{S.cmonly=e.target.checked;render()};
- $("reset-st").onclick=()=>{S.st="ALL";render()};
+ $("sort").onchange=e=>{S.sort=e.target.value;render()};$("dept").onchange=e=>{S.dept=e.target.value;render()};$("cmonly").onchange=e=>{S.cmonly=e.target.checked;render()};
  $("reset").onclick=()=>{Object.assign(S,{model:"ALL",st:"ALL",q:"",dept:"ALL",sort:"unit",cmonly:false});$("q").value="";$("sort").value="unit";$("dept").value="ALL";$("cmonly").checked=false;render()};
  $("sync").onclick=sync;$("file").onclick=()=>$("fileIn").click();$("fileIn").onchange=e=>{const f=e.target.files[0];if(f)loadFile(f);e.target.value=""};
- $("rules").onclick=()=>show("m-rules");
- $("exp").onclick=()=>{const cols=new Set(compCols(visible()));exportCSV(recsOf(visible()).filter(r=>cols.has(r.comp)&&(S.st==="ALL"||r.status===S.st)),`Kideco_Component_Health_${new Date().toISOString().slice(0,10)}.csv`)};
- $("u-exp").onclick=()=>CUR_UNIT&&exportCSV(Object.values(CUR_UNIT.comps),`Kideco_${CUR_UNIT.id}.csv`);
- document.addEventListener("click",e=>{
-  if(e.target.closest("[data-close]")){hide(e.target.closest(".modal").id);return}
-  if(e.target.classList.contains("modal")){hide(e.target.id);return}
-  const t=e.target.closest("[data-m],[data-st],[data-comp],[data-unit],[data-cell]");if(!t)return;
+ $("rules").onclick=openRules;$("d-close").onclick=closeDrawer;$("scrim").onclick=closeDrawer;
+ $("exp").onclick=()=>{const cs=new Set(cols(visible()));exportCSV(recsOf(visible()).filter(r=>cs.has(r.comp)&&(S.st==="ALL"||r.status===S.st)),`Kideco_Component_Health_${new Date().toISOString().slice(0,10)}.csv`)};
+ $("d-exp").onclick=()=>CUR&&exportCSV(Object.values(CUR.comps),`Kideco_${CUR.id}.csv`);
+ document.addEventListener("change",e=>{const c=e.target.closest("[data-chk]");if(!c)return;let d={};try{d=JSON.parse(lsGet(c.dataset.chk)||"{}")}catch{}d[c.dataset.i]=c.checked;lsSet(c.dataset.chk,JSON.stringify(d))});
+ document.addEventListener("click",e=>{const t=e.target.closest("[data-m],[data-st],[data-comp],[data-unit],[data-cell]");if(!t)return;
   if(t.dataset.m!==undefined){S.model=t.dataset.m;render()}
-  else if(t.dataset.st){S.st=S.st===t.dataset.st?"ALL":t.dataset.st;render()}
+  else if(t.dataset.st){S.st=S.st===t.dataset.st&&t.dataset.st!=="ALL"?"ALL":t.dataset.st;render()}
   else if(t.dataset.comp)focusComp(t.dataset.comp);
   else if(t.dataset.unit)openUnit(t.dataset.unit);
   else if(t.dataset.cell){const i=t.dataset.cell.indexOf("|");openComp(t.dataset.cell.slice(0,i),t.dataset.cell.slice(i+1))}});
- document.addEventListener("keydown",e=>{if(e.key==="Escape"){const m=["m-rules","m-comp","m-unit"].find(m=>!$(m).hidden);if(m)hide(m)}});
- // show cached data instantly, then sync
- const c=lsGet(CACHE_KEY);if(c){try{build(parseCSV(c));SRC={at:+lsGet(CACHE_AT)||0,from:"cache"};render();chip("cached","Data: cached")}catch{}}
- sync();
- if(AUTO_REFRESH_MIN>0)setInterval(()=>{if(!document.hidden)sync()},AUTO_REFRESH_MIN*6e4)}
+ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer()});
+ const c=lsGet(CACHE_KEY);if(c){try{build(parseCSV(c));SRC={at:+lsGet(CACHE_AT)||0};render();chip("cached","Cached data")}catch{}}
+ sync();if(AUTO_REFRESH_MIN>0)setInterval(()=>{if(!document.hidden)sync()},AUTO_REFRESH_MIN*6e4)}
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init):init();
 </script>
 </body>
